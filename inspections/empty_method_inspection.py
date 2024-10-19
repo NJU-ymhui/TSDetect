@@ -14,7 +14,6 @@ class EmptyMethodInspection(Inspection):
         return self.smell
 
     def visit(self, node):
-        # TODO: 有bug
         if self.smell:
             return
         if node.type == 'block':
