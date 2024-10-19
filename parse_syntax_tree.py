@@ -38,7 +38,7 @@ def generate_code(path):
 
 if __name__ == "__main__":
     parser = get_parser()
-    code = generate_code("E:\\LLM4SE\\ISSTA\\data\\java\\TSDetect\\tests\\resources\\annotation.java")
+    code = generate_code("E:\\LLM4SE\\ISSTA\\data\\java\\TSDetect\\tests\\resources\\exception.java")
     tree = get_tree(parser, code)
     visitor = TreeVisitor(tree.root_node)
     print("types:")

@@ -22,20 +22,21 @@ class EmptyMethodInspection(Inspection):
             print("parent::")
             print(node.parent.text)
         if node.type == 'method_declaration':  # constructor_declaration不在考虑范围内，即它可以为空
-            # i = 0
-            # block = node.children[i]
-            # print(":")
-            # while block.type != 'block' and i < len(node.children):
-            #     block = node.children[i]
-            #     print(block.type)
-            #     i += 1
-            # if block.type != 'block':
-            #     return
-            block = node.child_by_field_name('body')
-            if block:
-                print(block.text)  # 打印方法主体的 S-expression
-            else:
-                print(block)
+            i = 0
+            block = node.children[i]
+            print(":")
+            while block.type != 'block' and i < len(node.children):
+                block = node.children[i]
+                print(block.type)
+                i += 1
+            if block.type == ';':
+                # 说明这是一个带异常声明的函数声明，想要找到它的block需要从父节点开始
+                parent = node.parent
+                for candidate in parent.children:
+                    if candidate.type == 'block':
+                        block = candidate
+                        break
+            elif block.type != 'block':
                 return
             self.smell = self.__check_is_empty_block(block)
             return
