@@ -27,7 +27,7 @@ class TreeVisitor:
         for child in node.children:
             if child.type == 'method_declaration':
                 print("------")
-                print(child.children[4].children[0].type)
+                print(child.children[2].text)
                 print("------")
             self.__check_method_decl_helper(child)
 

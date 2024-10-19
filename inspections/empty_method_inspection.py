@@ -1,5 +1,6 @@
 from inspections.inspection import Inspection
 from util.smell_type import SmellType
+from util.util import get_method_body
 
 
 class EmptyMethodInspection(Inspection):
@@ -16,26 +17,9 @@ class EmptyMethodInspection(Inspection):
     def visit(self, node):
         if self.smell:
             return
-        if node.type == 'block':
-            print(node.text)
-            print("parent::")
-            print(node.parent.text)
         if node.type == 'method_declaration':  # constructor_declaration不在考虑范围内，即它可以为空
-            i = 0
-            block = node.children[i]
-            print(":")
-            while block.type != 'block' and i < len(node.children):
-                block = node.children[i]
-                print(block.type)
-                i += 1
-            if block.type == ';':
-                # 说明这是一个带异常声明的函数声明，想要找到它的block需要从父节点开始
-                parent = node.parent
-                for candidate in parent.children:
-                    if candidate.type == 'block':
-                        block = candidate
-                        break
-            elif block.type != 'block':
+            block = get_method_body(node)
+            if block is None:
                 return
             self.smell = self.__check_is_empty_block(block)
             return

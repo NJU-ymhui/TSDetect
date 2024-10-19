@@ -19,7 +19,7 @@ class DuplicateAssertInspection(Inspection):
         if self.smell:
             return
         if node.type == 'method_invocation':
-            name_node = node.children[0]
+            name_node = node.children[0]  # 节点0是调用方法名
             func_name = name_node.text
             args = node.children[1].text
             if func_name in self.assert_functions:

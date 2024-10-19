@@ -11,6 +11,11 @@ from inspections.empty_method_inspection import EmptyMethodInspection
 from inspections.exception_handling_inspection import ExceptionHandlingInspection
 from inspections.general_fixture_inspection import GeneralFixtureInspection
 from inspections.ignored_test_inspection import IgnoredTestInspection
+from inspections.lazy_test_inspection import LazyTestInspection
+from inspections.magic_number_inspection import MagicNumberInspection
+from inspections.mystery_guest_inspection import MysteryGuestInspection
+from inspections.redundant_assertion_inspection import RedundantAssertionInspection
+from inspections.redundant_print_inspection import RedundantPrintInspection
 
 
 def get_parser():
@@ -38,7 +43,7 @@ def generate_code(path):
 
 if __name__ == "__main__":
     parser = get_parser()
-    code = generate_code("E:\\LLM4SE\\ISSTA\\data\\java\\TSDetect\\tests\\resources\\exception.java")
+    code = generate_code("E:\\LLM4SE\\ISSTA\\data\\java\\TSDetect\\tests\\resources\\redundant_assert.java")
     tree = get_tree(parser, code)
     visitor = TreeVisitor(tree.root_node)
     print("types:")
@@ -61,6 +66,11 @@ if __name__ == "__main__":
     exception_handling_inspection = ExceptionHandlingInspection()
     general_fixture_inspection = GeneralFixtureInspection()
     ignored_test_inspection = IgnoredTestInspection()
+    lazy_test_inspection = LazyTestInspection()
+    magic_number_inspection = MagicNumberInspection()
+    mystery_guest_inspection = MysteryGuestInspection()
+    redundant_assertion_inspection = RedundantAssertionInspection()
+    redundant_print_inspection = RedundantPrintInspection()
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
@@ -72,6 +82,11 @@ if __name__ == "__main__":
     inspection_manager.register(exception_handling_inspection)
     inspection_manager.register(general_fixture_inspection)
     inspection_manager.register(ignored_test_inspection)
+    inspection_manager.register(lazy_test_inspection)
+    inspection_manager.register(magic_number_inspection)
+    inspection_manager.register(mystery_guest_inspection)
+    inspection_manager.register(redundant_assertion_inspection)
+    inspection_manager.register(redundant_print_inspection)
 
     visitor.register(inspection_manager)
     visitor.parse()  # 遍历语法树解析
