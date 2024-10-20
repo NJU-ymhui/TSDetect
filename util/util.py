@@ -57,3 +57,58 @@ def is_print(bs):
     return bs.startswith(b'System.out.print') or bs.startswith(b'System.out.println') or \
             bs.startswith(b'System.err.print') or bs.startswith(b'System.err.println')
 
+
+def get_class_name(node):
+    if node.type != 'class_declaration':
+        return None
+    return node.child_by_field_name('name').text
+
+
+def is_test_class(name):
+    return b'test' in name or b'Test' in name
+
+
+def is_test_func(method_decl_node):
+    if method_decl_node.type != 'method_declaration':
+        return False
+    for child in method_decl_node.children:
+        if child.type == 'modifiers':
+            # 看注解中是否包含test
+            for c in child.children:
+                if c.type == 'marker_annotation':
+                    return b'test' in child.text or b'Test' in child.text
+    return False
+
+
+def is_variable_decl(node):
+    ty = node.type
+    return ty == 'formal_parameter' or ty == 'field_declaration' or ty == 'local_variable_declaration'
+
+
+def print_child(node):
+    children = []
+    print(node.text)
+    print(node.type, "children: ", end="")
+    for child in node.children:
+        print(child.text, end=" ")
+        children.append(child)
+    if len(children) == 0:
+        return
+    print()
+    for child in children:
+        if len(child.children) == 0:
+            continue
+        print_child(child)
+
+
+def count_statements(method):
+    if method.text == b';':
+        return 1
+    cnt = 0
+    for child in method.children:
+        cnt += count_statements(child)
+    return cnt
+
+
+def is_method_decl(node):
+    return node.type == 'method_declaration'

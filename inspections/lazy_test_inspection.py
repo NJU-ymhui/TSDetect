@@ -1,28 +1,6 @@
 from inspections.inspection import Inspection
 from util.smell_type import SmellType
-from util.util import get_method_body, index_of, get_class_body
-
-
-def get_class_name(node):
-    if node.type != 'class_declaration':
-        return None
-    return node.child_by_field_name('name').text
-
-
-def is_test_class(name):
-    return b'test' in name or b'Test' in name
-
-
-def is_test_func(method_decl_node):
-    if method_decl_node.type != 'method_declaration':
-        return False
-    for child in method_decl_node.children:
-        if child.type == 'modifiers':
-            # 看注解中是否包含test
-            for c in child.children:
-                if c.type == 'marker_annotation':
-                    return b'test' in child.text or b'Test' in child.text
-    return False
+from util.util import get_method_body, index_of, get_class_body, get_class_name, is_test_class, is_test_func
 
 
 class LazyTestInspection(Inspection):

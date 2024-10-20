@@ -16,6 +16,11 @@ from inspections.magic_number_inspection import MagicNumberInspection
 from inspections.mystery_guest_inspection import MysteryGuestInspection
 from inspections.redundant_assertion_inspection import RedundantAssertionInspection
 from inspections.redundant_print_inspection import RedundantPrintInspection
+from inspections.resource_optimism_inspection import ResourceOptimismInspection
+from inspections.sensitive_equality_inspection import SensitiveEqualityInspection
+from inspections.sleepy_test_inspection import SleepyTestInspection
+from inspections.unknown_test_inspection import UnknownTestInspection
+from inspections.verbose_test_inspection import VerboseTestInspection
 
 
 def get_parser():
@@ -71,6 +76,11 @@ if __name__ == "__main__":
     mystery_guest_inspection = MysteryGuestInspection()
     redundant_assertion_inspection = RedundantAssertionInspection()
     redundant_print_inspection = RedundantPrintInspection()
+    resource_optimism_inspection = ResourceOptimismInspection()
+    sensitive_equality_inspection = SensitiveEqualityInspection()
+    sleepy_test_inspection = SleepyTestInspection()
+    unknown_test_inspection = UnknownTestInspection()
+    verbose_test_inspection = VerboseTestInspection()
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
@@ -87,6 +97,11 @@ if __name__ == "__main__":
     inspection_manager.register(mystery_guest_inspection)
     inspection_manager.register(redundant_assertion_inspection)
     inspection_manager.register(redundant_print_inspection)
+    inspection_manager.register(resource_optimism_inspection)
+    inspection_manager.register(sensitive_equality_inspection)
+    inspection_manager.register(sleepy_test_inspection)
+    inspection_manager.register(unknown_test_inspection)
+    inspection_manager.register(verbose_test_inspection)
 
     visitor.register(inspection_manager)
     visitor.parse()  # 遍历语法树解析
