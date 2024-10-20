@@ -18,7 +18,7 @@ class LazyTestInspection(Inspection):
 
     def __visit_method_invocation_4_test(self, statement):
         if statement.type == 'method_invocation':
-            print(statement.text)
+            # print(statement.text)
             # 作为Java中的待测函数，被测试的时候一般通过'.'访问
             index = index_of(statement, b'.')
             if index > 0:

@@ -21,6 +21,7 @@ from inspections.sensitive_equality_inspection import SensitiveEqualityInspectio
 from inspections.sleepy_test_inspection import SleepyTestInspection
 from inspections.unknown_test_inspection import UnknownTestInspection
 from inspections.verbose_test_inspection import VerboseTestInspection
+import os
 
 
 def get_parser():
@@ -46,21 +47,7 @@ def generate_code(path):
     return code
 
 
-if __name__ == "__main__":
-    parser = get_parser()
-    code = generate_code("E:\\LLM4SE\\ISSTA\\data\\java\\TSDetect\\tests\\resources\\redundant_assert.java")
-    tree = get_tree(parser, code)
-    visitor = TreeVisitor(tree.root_node)
-    print("types:")
-    visitor.check_all_types()
-    # print("calls:")
-    # visitor.check_method_call()
-    # print("decls:")
-    # visitor.check_method_decl()
-    # print("statements:")
-    # visitor.print_statements_from_root()
-
-    inspection_manager = InspectionManager()
+def register_for(inspection_manager):
     assertion_roulette_inspection = AssertionRouletteInspection()
     conditional_test_logic_inspection = ConditionalTestLogicInspection()
     constructor_initialization_inspection = ConstructorInitializationInspection()
@@ -103,6 +90,42 @@ if __name__ == "__main__":
     inspection_manager.register(unknown_test_inspection)
     inspection_manager.register(verbose_test_inspection)
 
+
+def parse(path):
+    parser = get_parser()
+    code = generate_code(path)
+    tree = get_tree(parser, code)
+    visitor = TreeVisitor(tree.root_node)
+    # print("types:")
+    # visitor.check_all_types()
+    # print("calls:")
+    # visitor.check_method_call()
+    # print("decls:")
+    # visitor.check_method_decl()
+    # print("statements:")
+    # visitor.print_statements_from_root()
+
+    inspection_manager = InspectionManager()
+    register_for(inspection_manager)
+
     visitor.register(inspection_manager)
     visitor.parse()  # 遍历语法树解析
+    print("smell types in", path, end=":\n")
     print(inspection_manager.get_smells())  # 查看所有smell
+    print()
+
+
+def main(directory, author_test=False):
+    for root, dirs, files in os.walk(directory):
+        # print(dirs, files)
+        if "author_tests" in dirs and not author_test:
+            dirs.remove("author_tests")
+        for file in files:
+            if file.endswith('.java'):
+                file_path = os.path.join(root, file)
+                parse(file_path)  # 开始解析文件
+
+
+if __name__ == "__main__":
+    path = "tests\\resources"
+    main(path)

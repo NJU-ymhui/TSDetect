@@ -61,8 +61,8 @@ class ResourceOptimismInspection(Inspection):
                         self.unchecked_files[area] = unchecked_list
             return
         if node.type == 'method_invocation':
-            print_child(node)
-            print()
+            # print_child(node)
+            # print()
             if node.children[1].text == b'.':
                 callee = node.children[0].text
                 method = node.children[2].text
