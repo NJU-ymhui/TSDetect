@@ -4,11 +4,12 @@ from util.util import get_method_body, index_of, get_class_body, get_class_name,
 
 
 class LazyTestInspection(Inspection):
-    def __init__(self):
+    def __init__(self, max_calls=3):
         super().__init__()
         self.lazy_candidates = []
         self.invocation_cnt = 0
         self.method_decl_name = b''
+        self.max_calls = max_calls  # 最多调用的方法数，若超过则认为可能存在潜在的smell
 
     def get_smell_type(self):
         return SmellType.LAZY_TEST
@@ -22,7 +23,7 @@ class LazyTestInspection(Inspection):
             # 作为Java中的待测函数，被测试的时候一般通过'.'访问
             index = index_of(statement, b'.')
             if index > 0:
-                if self.invocation_cnt > 0:
+                if self.invocation_cnt > self.max_calls:
                     self.smell = True
                     return
                 else:
@@ -41,7 +42,7 @@ class LazyTestInspection(Inspection):
         if statement.type == 'method_invocation':
             index = index_of(statement, b'.')
             if index > 0:
-                if self.invocation_cnt > 0:
+                if self.invocation_cnt > self.max_calls:
                     # 这个方法可能引入smell
                     # method_decl的下标为2节点是名字
                     self.lazy_candidates.append(self.method_decl_name)
