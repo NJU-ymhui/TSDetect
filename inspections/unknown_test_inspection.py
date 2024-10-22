@@ -6,9 +6,9 @@ from util.util import is_test_func
 class UnknownTestInspection(Inspection):
     def __init__(self):
         super().__init__()
-        self.assert_functions = [b'assertTrue', b'assertFalse', b'assertNotNull', b'assertNull',
-                                 b'assertArrayEquals', b'assertEquals', b'assertNotSame', b'assertSame',
-                                 b'assertThrows', b'assertNotEquals']
+        self.__assert_functions = [b'assertTrue', b'assertFalse', b'assertNotNull', b'assertNull',
+                                   b'assertArrayEquals', b'assertEquals', b'assertNotSame', b'assertSame',
+                                   b'assertThrows', b'assertNotEquals']
         
     def get_smell_type(self):
         return SmellType.UNKNOWN_TEST
@@ -20,7 +20,7 @@ class UnknownTestInspection(Inspection):
         res = False
         for child in test_func_node.children:
             if child.type == 'method_invocation':
-                if child.children[0].text in self.assert_functions:
+                if child.children[0].text in self.__assert_functions:
                     return True
             else:
                 res = res or self.__visit_children(child)

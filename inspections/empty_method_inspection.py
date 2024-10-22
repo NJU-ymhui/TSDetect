@@ -6,7 +6,7 @@ from util.util import get_method_body
 class EmptyMethodInspection(Inspection):
     def __init__(self):
         super().__init__()
-        self.skip_list = ['{', '}', 'line_comment']  # 事实上根据协议line_comment在visit时就会跳过
+        self.__skip_list = ['{', '}', 'line_comment']  # 事实上根据协议line_comment在visit时就会跳过
 
     def get_smell_type(self):
         return SmellType.EMPTY_TEST
@@ -27,7 +27,7 @@ class EmptyMethodInspection(Inspection):
 
     def __check_is_empty_block(self, block_node):
         for child in block_node.children:
-            if child.type in self.skip_list:
+            if child.type in self.__skip_list:
                 continue
             else:
                 return False

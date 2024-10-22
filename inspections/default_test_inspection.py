@@ -6,7 +6,7 @@ import re
 class DefaultTestInspection(Inspection):
     def __init__(self):
         super().__init__()
-        self.pattern = r'[Ee]xample.*[Tt]est'
+        self.__pattern = r'[Ee]xample.*[Tt]est'
 
     def get_smell_type(self):
         return SmellType.DEFAULT_TEST
@@ -18,6 +18,6 @@ class DefaultTestInspection(Inspection):
         if self.smell:
             return
         text = str(node.text)
-        match = re.search(self.pattern, text)
+        match = re.search(self.__pattern, text)
         self.smell = match
         return

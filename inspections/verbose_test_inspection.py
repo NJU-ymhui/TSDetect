@@ -7,7 +7,7 @@ class VerboseTestInspection(Inspection):
     # 判断是否为冗长测试，若是则触发该smell
     def __init__(self, max_statements=14):
         super().__init__()
-        self.max_statements = max_statements
+        self.__max_statements = max_statements
 
     def get_smell_type(self):
         return SmellType.VERBOSE_TEST
@@ -20,5 +20,5 @@ class VerboseTestInspection(Inspection):
             return
         if is_method_decl(node):
             # print(":::", count_statements(node))
-            self.smell = count_statements(node) > self.max_statements
+            self.smell = count_statements(node) > self.__max_statements
         return
