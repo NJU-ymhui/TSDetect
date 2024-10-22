@@ -8,7 +8,7 @@ class RedundantAssertionInspection(Inspection):
         super().__init__()
         self.assert_functions = [b'fail', b'assertTrue', b'assertFalse', b'assertNotNull', b'assertNull',
                                  b'assertArrayEquals', b'assertEquals', b'assertNotSame', b'assertSame',
-                                 b'assertThrows', b'assertNotEquals']
+                                 b'assertThrows', b'assertNotEquals', b'assertThat']
 
     def get_smell_type(self):
         return SmellType.REDUNDANT_ASSERTION

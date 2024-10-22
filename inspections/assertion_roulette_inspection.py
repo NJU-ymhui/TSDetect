@@ -5,6 +5,10 @@ from util.smell_type import SmellType
 class AssertionRouletteInspection(Inspection):
     def __init__(self):
         super().__init__()
+        self.one_param_assert = [b'fail']
+        self.two_params_assert = [b'assertTrue', b'assertFalse', b'assertNull', b'assertNotNull', b'assertThat']
+        self.three_params_assert = [b'assertEquals', b'assertNotEquals', b'assertArrayEquals', b'assertNotSame',
+                                    b'assertSame', b'assertThrows']
 
     def get_smell_type(self):
         return SmellType.ASSERTION_ROULETTE
@@ -18,17 +22,17 @@ class AssertionRouletteInspection(Inspection):
         if node.type == 'method_invocation':
             name_node = node.children[0]
             func_name = name_node.text
-            if func_name == b'fail':  # fail(), 没有参数则无法提供上下文信息，认为存在smell
+            if func_name in self.one_param_assert:  # fail(), 没有参数则无法提供上下文信息，认为存在smell
                 params_list_node = node.children[1]
                 if (len(params_list_node.children) - 1) // 2 < 1:
                     self.smell = True
                     return
-            elif func_name == b'assertTrue' or func_name == b'assertFalse':  # 同理若没有消息参数则无法传递上下文信息
+            elif func_name in self.two_params_assert:  # 同理若没有消息参数则无法传递上下文信息
                 params_list_node = node.children[1]
                 if (len(params_list_node.children) - 1) // 2 < 2:
                     self.smell = True
                     return
-            elif func_name == b'assertEquals':
+            elif func_name in self.three_params_assert:
                 params_list_node = node.children[1]
                 if (len(params_list_node.children) - 1) // 2 < 3:
                     self.smell = True
