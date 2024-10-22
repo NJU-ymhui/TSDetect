@@ -1,6 +1,6 @@
 from inspections.inspection import Inspection
 from util.smell_type import SmellType
-from util.util import get_method_body, index_of, get_class_body, get_class_name, is_test_class, is_test_func
+from util.util import get_method_body, index_of, get_class_body, get_class_name, is_test_class, is_test_func, is_print
 
 
 class LazyTestInspection(Inspection):
@@ -19,6 +19,8 @@ class LazyTestInspection(Inspection):
 
     def __visit_method_invocation_4_test(self, statement):
         if statement.type == 'method_invocation':
+            if is_print(statement):
+                return
             # print(statement.text)
             # 作为Java中的待测函数，被测试的时候一般通过'.'访问
             index = index_of(statement, b'.')
