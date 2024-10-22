@@ -6,10 +6,10 @@ from util.util import get_method_body, index_of, get_class_body, get_class_name,
 class LazyTestInspection(Inspection):
     def __init__(self, max_calls=3):
         super().__init__()
-        self.lazy_candidates = []
-        self.invocation_cnt = 0
-        self.method_decl_name = b''
-        self.max_calls = max_calls  # 最多调用的方法数，若超过则认为可能存在潜在的smell
+        self.__lazy_candidates = []
+        self.__invocation_cnt = 0
+        self.__method_decl_name = b''
+        self.__max_calls = max_calls  # 最多调用的方法数，若超过则认为可能存在潜在的smell
 
     def get_smell_type(self):
         return SmellType.LAZY_TEST
@@ -23,14 +23,14 @@ class LazyTestInspection(Inspection):
             # 作为Java中的待测函数，被测试的时候一般通过'.'访问
             index = index_of(statement, b'.')
             if index > 0:
-                if self.invocation_cnt > self.max_calls:
+                if self.__invocation_cnt > self.__max_calls:
                     self.smell = True
                     return
                 else:
-                    self.invocation_cnt += 1
+                    self.__invocation_cnt += 1
             else:
                 func_name = statement.children[0]
-                if func_name in self.lazy_candidates:
+                if func_name in self.__lazy_candidates:
                     self.smell = True
                     return
                 # else: 调用了一个不会引入lazy smell的普通函数，那么认为不会引起test smell
@@ -42,17 +42,17 @@ class LazyTestInspection(Inspection):
         if statement.type == 'method_invocation':
             index = index_of(statement, b'.')
             if index > 0:
-                if self.invocation_cnt > self.max_calls:
+                if self.__invocation_cnt > self.__max_calls:
                     # 这个方法可能引入smell
                     # method_decl的下标为2节点是名字
-                    self.lazy_candidates.append(self.method_decl_name)
+                    self.__lazy_candidates.append(self.__method_decl_name)
                     return
                 else:
-                    self.invocation_cnt += 1
+                    self.__invocation_cnt += 1
             else:
                 func_name = statement.children[0]
-                if func_name in self.lazy_candidates:
-                    self.lazy_candidates.append(self.method_decl_name)
+                if func_name in self.__lazy_candidates:
+                    self.__lazy_candidates.append(self.__method_decl_name)
                     return
         for child in statement.children:
             if not self.smell:
@@ -68,8 +68,8 @@ class LazyTestInspection(Inspection):
                 body = get_class_body(node)
                 for child in body.children:  # 遍历类主体的各个子节点
                     if child.type == 'method_declaration':
-                        self.method_decl_name = child.children[2].text
-                        self.invocation_cnt = 0
+                        self.__method_decl_name = child.children[2].text
+                        self.__invocation_cnt = 0
                         block = get_method_body(child)  # 方法的主体
                         if block is None:
                             return

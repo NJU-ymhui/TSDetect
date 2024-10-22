@@ -1,13 +1,13 @@
 class InspectionManager:
     def __init__(self):
-        self.inspections = []
+        self.__inspections = []
 
     def register(self, inspection):
-        self.inspections.append(inspection)
+        self.__inspections.append(inspection)
 
     def visit(self, node):
-        for inspection in self.inspections:
+        for inspection in self.__inspections:
             inspection.visit(node)
 
     def get_smells(self):
-        return [str(inspection.get_smell_type()) for inspection in self.inspections if inspection.has_smell()]
+        return [str(inspection.get_smell_type()) for inspection in self.__inspections if inspection.has_smell()]

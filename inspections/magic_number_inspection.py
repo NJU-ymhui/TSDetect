@@ -6,7 +6,7 @@ from util.util import is_number
 class MagicNumberInspection(Inspection):
     def __init__(self):
         super().__init__()
-        self.assert_functions = [b'assertTrue', b'assertFalse', b'assertNotNull', b'assertNull',
+        self.__assert_functions = [b'assertTrue', b'assertFalse', b'assertNotNull', b'assertNull',
                                  b'assertArrayEquals', b'assertEquals', b'assertNotSame', b'assertSame',
                                  b'assertThrows', b'assertNotEquals', b'assertThat']
 
@@ -22,7 +22,7 @@ class MagicNumberInspection(Inspection):
         if node.type == 'method_invocation':
             name_node = node.children[0]  # 节点0是调用方法名
             func_name = name_node.text
-            if func_name in self.assert_functions:
+            if func_name in self.__assert_functions:
                 # 检查参数有没有数字
                 for child in node.children:
                     if child.type == 'argument_list':
