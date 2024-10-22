@@ -1,3 +1,6 @@
+import re
+
+
 def get_method_body(node):
     """
     获取方法的代码体部分
@@ -112,3 +115,10 @@ def count_statements(method):
 
 def is_method_decl(node):
     return node.type == 'method_declaration'
+
+
+def ignore_annotation(bs):
+    s = str(bs)
+    ignore = r'(.*)[Ii][Gg][Nn][Oo][Rr][Ee][Dd](.*)'
+    disabled = r'(.*)[Dd][Ii][Ss][Aa][Bb][Ll][Ee][Dd](.*)'
+    return re.search(ignore, s) or re.search(disabled, s)

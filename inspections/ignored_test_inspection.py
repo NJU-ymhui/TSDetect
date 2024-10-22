@@ -1,5 +1,6 @@
 from inspections.inspection import Inspection
 from util.smell_type import SmellType
+from util.util import ignore_annotation
 
 
 class IgnoredTestInspection(Inspection):
@@ -19,8 +20,6 @@ class IgnoredTestInspection(Inspection):
             return
         if node.type == 'marker_annotation' or node.type == 'normal_annotation' or node.type == 'annotation':
             text = node.text
-            if text == b'@Ignore' or text == b'@Disabled':
-                self.smell = True
-                return
+            self.smell = ignore_annotation(text)
             return
         return
