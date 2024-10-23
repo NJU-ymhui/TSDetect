@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 )
 
 var globalVar int = 10
@@ -12,7 +13,7 @@ func Add(a, b int) int {
 }
 
 func Sub(a, b int) int {
-    a = a;
+    a = a
 	return a - b
 }
 
@@ -26,15 +27,16 @@ func TestAdd(t *testing.T) {
 		{0, 0, 0},
 		{2, 3, 5},
 	}
-
+    time.Sleep(1000)
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%d+%d", tt.a, tt.b), func(t *testing.T) {
 			result := Add(tt.a, tt.b)
 			result2 := Sub(tt.b, tt.a)
-// 			result2 := Sub(tt.b, tt.a)
+			result2 := Sub(tt.b, tt.a)
+			result := Add(result2, 1)
 			if result != tt.expected {
 				t.Errorf("Add(%d, %d) = %d; want %d")
-				t.Errorf("Add(%d, %d) = %d; want %d")
+				t.Errorf("Add(%d, %d) = %d; want %d", 10, 10, 10, 10)
 			}
 		})
 	}
@@ -43,4 +45,5 @@ func TestAdd(t *testing.T) {
 func ExampleTest(a, b int) {
 //     Add(a, b)
 //     Add(a, b)
+	t.Errorf("Add(%d, %d) = %d; want %d")
 }

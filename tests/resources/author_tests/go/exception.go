@@ -15,6 +15,8 @@ func mayPanic() {
 
 func main() {
     err := doSomething()
+    doSomething()
+    doSomething()
     if err != nil {
         fmt.Println("Error:", err)
     }

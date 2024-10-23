@@ -1,85 +1,81 @@
 from inspections.inspection import Inspection
 from util.smell_type import SmellType
-from util.util import is_variable_decl, print_child
+from util.util import is_global_var
 
 
 class ResourceOptimismInspection(Inspection):
-    # TODO 暂时无法解决一个方法接受File参数，然后方法内部检验 /不检验file的存在，之后一个File变量通过该方法传进去，暂时判断不了
     def __init__(self):
         super().__init__()
-        self.__current_method = 0  # 0表示成员变量
-        self.__unchecked_files = {0: []}
-        self.__checked_files = {0: []}  # 事实上只有成员变量可能用到这个数据结构，因为只有成员变量可能先使用再声明，而局部变量不可能
-        self.__check_methods = [b'exists', b'notExists', b'isFile']
+        self.__global_err = []
+        self.__local_err = []
+        self.__check_methods = [b'os.IsNotExist', b'os.IsExist']
 
     def get_smell_type(self):
         return SmellType.RESOURCE_OPTIMISM
 
     def has_smell(self):
-        for key in self.__unchecked_files.keys():
-            if len(self.__unchecked_files[key]) > 0:
-                return True
-        return False
+        return self.smell or len(self.__local_err) > 0 or len(self.__global_err) > 0
 
-    def __is_file_decl(self, decl_node):
-        b = False
-        for child in decl_node.children:
-            if child.type == 'type_identifier':
-                return child.text == b'File'
-            b = b or self.__is_file_decl(child)
-            if b:
-                return True
-        return b
-
-    def __get_params_name(self, node):
-        res = []
-        for child in node.children:
-            if child.type == 'identifier':
-                res.append(child.text)
-                continue
-            res.extend(self.__get_params_name(child))
-        return res
+    # def __is_file_decl(self, decl_node):
+    #     b = False
+    #     for child in decl_node.children:
+    #         if child.type == 'type_identifier':
+    #             return child.text == b'File'
+    #         b = b or self.__is_file_decl(child)
+    #         if b:
+    #             return True
+    #     return b
+    #
+    # def __get_params_name(self, node):
+    #     res = []
+    #     for child in node.children:
+    #         if child.type == 'identifier':
+    #             res.append(child.text)
+    #             continue
+    #         res.extend(self.__get_params_name(child))
+    #     return res
 
     def visit(self, node):
-        if node.type == 'method_declaration':
-            self.__current_method += 1
-            self.__unchecked_files[self.__current_method] = []
-            self.__checked_files[self.__current_method] = []
+        if self.smell:
             return
-        if is_variable_decl(node):
-            if node.parent.type == 'field_declaration':
-                area = 0
-            else:
-                area = self.__current_method
-            if self.__is_file_decl(node):
-                file_names = self.__get_params_name(node)
-                unchecked_list = self.__unchecked_files[area]
-                checked_list = self.__checked_files[area]
-                for file_name in file_names:
-                    if file_name not in checked_list and file_names not in unchecked_list:
-                        unchecked_list.append(file_name)
-                        self.__unchecked_files[area] = unchecked_list
-            return
-        if node.type == 'method_invocation':
-            # print_child(node)
-            # print()
-            if node.children[1].text == b'.':
-                callee = node.children[0].text
-                method = node.children[2].text
-                if method in self.__check_methods:
-                    # 这是一个资源检测的方法
-                    unchecked_list = self.__unchecked_files[self.__current_method]
-                    if callee in unchecked_list:
-                        unchecked_list.remove(callee)
-                        self.__unchecked_files[self.__current_method] = unchecked_list
-                    else:
-                        unchecked_list = self.__unchecked_files[0]
-                        if callee in unchecked_list:
-                            unchecked_list.remove(callee)
-                            self.__unchecked_files[0] = unchecked_list
-                        else:
-                            # callee既不在当前函数的列表里，也不在当前类的成员变量里，说明声明在下面，在checked_files里存一下
-                            checked_list = self.__checked_files[0]
-                            checked_list.append(callee)
-                            self.__checked_files[0] = checked_list
-        return
+        if node.type in ['short_var_declaration', 'var_declaration']:
+            if len(node.children) >= 3:
+                # 形如_, err := os.Open(...)的一定满足上述条件
+                left = node.children[0]  # expression_list
+                right = node.children[2]  # expression_list
+                if len(left.children) != 3 or not (right.text.startswith(b'os.Open') or right.text.startswith(b'os.Stat')):
+                    return
+                err = left.children[2].text
+                if is_global_var(node):
+                    self.__global_err.append(err)
+                else:
+                    self.__local_err.append(err)
+        elif node.type == 'function_declaration':
+            self.smell = len(self.__local_err) > 0
+            if self.smell:
+                return
+            self.__local_err = []
+        elif node.type == 'call_expression':
+            # 第一个子节点若是check_methods中之一，则进行了资源检测
+            if node.children[0].text in self.__check_methods:
+                for args in node.children:
+                    if args.type == 'argument_list':
+                        for arg in args.children:
+                            if arg.type == 'identifier':
+                                # 一步步找到函数的参数
+                                if arg.text in self.__local_err:
+                                    self.__local_err.remove(arg.text)
+                                elif arg.text in self.__global_err:
+                                    self.__global_err.remove(arg.text)
+        elif node.type == 'binary_expression':
+            # 形如err != nil
+            err_candidate = node.children[0].text
+            op = node.children[1]
+            nil_candidate = node.children[2]
+            if nil_candidate.type == 'nil' and op.type in ['!=', '==']:
+                # 最后一个是nil, 比较符是!= 或 ==
+                if err_candidate in self.__local_err:
+                    self.__local_err.remove(err_candidate)
+                elif err_candidate in self.__global_err:
+                    self.__global_err.remove(err_candidate)
+
