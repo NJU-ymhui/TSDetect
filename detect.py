@@ -29,10 +29,10 @@ def get_parser():
     Language.build_library(
         'build/my-languages.so',
         [
-            'tree-sitter-java'
+            'tree-sitter-go'
         ]
     )
-    java_language = Language('build/my-languages.so', 'java')
+    java_language = Language('build/my-languages.so', 'go')
     parser.set_language(java_language)
     return parser
 
@@ -71,7 +71,7 @@ def register_for(inspection_manager):
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
-    inspection_manager.register(constructor_initialization_inspection)
+    # inspection_manager.register(constructor_initialization_inspection)  # go没有构造函数
     inspection_manager.register(default_test_inspection)
     inspection_manager.register(duplicate_assert_inspection)
     inspection_manager.register(eager_test_inspection)
@@ -96,8 +96,8 @@ def parse(path):
     code = generate_code(path)
     tree = get_tree(parser, code)
     visitor = TreeVisitor(tree.root_node)
-    # print("types:")
-    # visitor.check_all_types()
+    print("types:")
+    visitor.check_all_types()
     # print("calls:")
     # visitor.check_method_call()
     # print("decls:")
@@ -121,11 +121,11 @@ def main(directory, author_test=False):
         if "author_tests" in dirs and not author_test:
             dirs.remove("author_tests")
         for file in files:
-            if file.endswith('.java'):
+            if file.endswith('.go'):
                 file_path = os.path.join(root, file)
                 parse(file_path)  # 开始解析文件
 
 
 if __name__ == "__main__":
     path = "tests\\resources"
-    main(path)
+    main(path, author_test=True)

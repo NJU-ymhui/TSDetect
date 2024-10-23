@@ -36,7 +36,7 @@ class TreeVisitor:
 
     def __check_all_types_helper(self, node):
         for child in node.children:
-            print(child.type)
+            print(child.type + ":", child.text)
             self.__check_all_types_helper(child)
 
     def check_all_types(self):
@@ -48,7 +48,7 @@ class TreeVisitor:
 
     def __parse_helper(self, node):
         for child in node.children:
-            if child.type == 'line_comment':
+            if child.type == 'comment':  # go的注释
                 continue
             self.inspection_manager.visit(child)
             self.__parse_helper(child)

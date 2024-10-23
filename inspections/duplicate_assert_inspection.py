@@ -6,8 +6,7 @@ class DuplicateAssertInspection(Inspection):
     def __init__(self):
         super().__init__()
         self.__asserts_args = {}
-        self.__assert_functions = [b'assertTrue', b'assertFalse', b'assertNotNull', b'assertNull', b'assertArrayEquals',
-                                   b'assertEquals', b'assertNotSame', b'assertSame', b'assertThrows', b'assertNotEquals']
+        self.__assert_functions = [b'Error', b'Errorf', b'Fatal', b'Log']
 
     def get_smell_type(self):
         return SmellType.DUPLICATE_ASSERT
@@ -18,7 +17,7 @@ class DuplicateAssertInspection(Inspection):
     def visit(self, node):
         if self.smell:
             return
-        if node.type == 'method_invocation':
+        if node.type == 'call_expression':
             name_node = node.children[0]  # 节点0是调用方法名
             func_name = name_node.text
             args = node.children[1].text
