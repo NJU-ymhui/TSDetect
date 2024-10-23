@@ -4,12 +4,15 @@ import (
 	"testing"
 )
 
+var globalVar int = 10
+
 // 被测试的函数
 func Add(a, b int) int {
 	return a + b
 }
 
 func Sub(a, b int) int {
+    a = a;
 	return a - b
 }
 
@@ -31,12 +34,13 @@ func TestAdd(t *testing.T) {
 // 			result2 := Sub(tt.b, tt.a)
 			if result != tt.expected {
 				t.Errorf("Add(%d, %d) = %d; want %d")
+				t.Errorf("Add(%d, %d) = %d; want %d")
 			}
 		})
 	}
 }
 
-func ExampleTest(a, b, int) {
-    Add(a, b)
-    Add(a, b)
+func ExampleTest(a, b int) {
+//     Add(a, b)
+//     Add(a, b)
 }

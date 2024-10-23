@@ -40,6 +40,7 @@ class TreeVisitor:
             self.__check_all_types_helper(child)
 
     def check_all_types(self):
+        print("root:", self.root.type)
         return self.__check_all_types_helper(self.root)
 
     def register(self, manager):

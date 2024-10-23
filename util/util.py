@@ -1,29 +1,38 @@
 import re
 
 
-def get_method_body(node):
+def get_method_body(node, language="java"):
     """
     获取方法的代码体部分
     :param node: 方法节点
+    :param language: 待测语言
     :return: 方法block
     """
-    if node.type != 'method_declaration':
-        return None
-    i = 0
-    block = node.children[i]
-    while block.type != 'block' and i < len(node.children):
+    if language == "java":
+        if node.type != 'method_declaration':
+            return None
+        i = 0
         block = node.children[i]
-        i += 1
-    if block.type == ';':
-        # 说明这是一个带异常声明的函数声明，想要找到它的block需要从父节点开始
-        parent = node.parent
-        for candidate in parent.children:
-            if candidate.type == 'block':
-                block = candidate
-                return block
-    elif block.type != 'block':
+        while block.type != 'block' and i < len(node.children):
+            block = node.children[i]
+            i += 1
+        if block.type == ';':
+            # 说明这是一个带异常声明的函数声明，想要找到它的block需要从父节点开始
+            parent = node.parent
+            for candidate in parent.children:
+                if candidate.type == 'block':
+                    block = candidate
+                    return block
+        elif block.type != 'block':
+            return None
+        return block
+    elif language == 'go':
+        if node.type != 'function_declaration':
+            return None
+        for i, child in enumerate(node.children):
+            if child.type == 'block':
+                return child
         return None
-    return block
 
 
 def is_number(bs):

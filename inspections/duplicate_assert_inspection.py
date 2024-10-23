@@ -18,9 +18,14 @@ class DuplicateAssertInspection(Inspection):
         if self.smell:
             return
         if node.type == 'call_expression':
-            name_node = node.children[0]  # 节点0是调用方法名
-            func_name = name_node.text
-            args = node.children[1].text
+            # 形如b.Error("msg")
+            func_name = b''
+            for child in node.children:
+                if child.type == 'selector_expression':
+                    for grand_child in child.children:
+                        if grand_child.type == 'field_identifier' and grand_child.text in self.__assert_functions:
+                            func_name = grand_child.text
+            args = node.children[1].text  # call_expression一共俩节点，一个selector_expression，一个argument_list
             if func_name in self.__assert_functions:
                 if func_name in self.__asserts_args.keys():
                     args_list = self.__asserts_args[func_name]
@@ -28,6 +33,7 @@ class DuplicateAssertInspection(Inspection):
                         self.smell = True
                     else:
                         args_list.append(args)
+                        self.__asserts_args[func_name] = args_list
                 else:
                     args_list = [args]
                     self.__asserts_args[func_name] = args_list
