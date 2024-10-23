@@ -36,10 +36,11 @@ class TreeVisitor:
 
     def __check_all_types_helper(self, node):
         for child in node.children:
-            print(child.type)
+            print(child.type + ":", child.text)
             self.__check_all_types_helper(child)
 
     def check_all_types(self):
+        print("root:", self.root.type)
         return self.__check_all_types_helper(self.root)
 
     def register(self, manager):

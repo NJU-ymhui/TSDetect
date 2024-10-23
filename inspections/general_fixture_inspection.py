@@ -5,12 +5,21 @@ from util.smell_type import SmellType
 class GeneralFixtureInspection(Inspection):
     def __init__(self):
         super().__init__()
+        self.__global_vars = {}
+        self.__local_vars = {}
 
     def get_smell_type(self):
         return SmellType.GENERAL_FIXTURE
 
     def has_smell(self):
-        return self.smell
+        if self.smell:
+            return self.smell
+        for glob in self.__global_vars.keys():
+            if self.__global_vars[glob] == 0:
+                return True
+        for loc in self.__local_vars.keys():
+            if self.__local_vars[loc] == 0:
+                return True
 
     def __visit_children(self, unused_dict, node):
         for child in node.children:
@@ -23,21 +32,40 @@ class GeneralFixtureInspection(Inspection):
                 unused_dict = self.__visit_children(unused_dict, child)
         return unused_dict
 
+    def __check_parent_type(self, node, parent_types):
+        parent = node.parent
+        if parent is None:
+            return False
+        if parent.type in parent_types:
+            return True
+        return self.__check_parent_type(parent, parent_types)
+
     def visit(self, node):
-        # TODO 目前只能识别类中的冗余字段，扩展到函数？
         if self.smell:
             return
-        unused_fields = {}
         if node.type == 'class_body':
             # 获取类中的所有字段
             for child in node.children:
                 if child.type == 'field_declaration':
                     for field in child.children:
                         if field.type == 'variable_declarator':
-                            field_name = field.children[0].text.decode('utf-8')  # 'variable_declarator'节点下标为0的子节点是变量名
-                            unused_fields[field_name] = field
-            # 遍历类中的方法
-            for method in node.children:
-                if method.type == 'method_declaration':
-                    unused_fields = self.__visit_children(unused_fields, method)
-            self.smell = len(unused_fields) > 0
+                            self.__global_vars[field.text] = 0
+        elif node.type == 'method_declaration':
+            for loc in self.__local_vars.keys():
+                if self.__local_vars[loc] == 0:
+                    self.smell = True
+                    return
+            self.__local_vars = {}
+        elif node.type == 'local_variable_declaration':
+            for child in node.children:
+                if child.type == 'variable_declarator':
+                    for var in child.children:
+                        if var.type == 'identifier':
+                            self.__local_vars[var.text] = 0
+        else:
+            if node.type == 'identifier' and not self.__check_parent_type(node, ['field_declaration',
+                                                                                 'local_variable_declaration']):
+                if node.text in self.__local_vars.keys():
+                    self.__local_vars[node.text] += 1
+                elif node.text in self.__global_vars.keys():
+                    self.__global_vars[node.text] += 1
