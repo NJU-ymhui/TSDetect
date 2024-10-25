@@ -7,6 +7,8 @@ public class FileTest {
 
     private File testFile = new File("test.txt"), testFile2 = new File("test2.txt");
 
+    void func() {}
+
     @Test
     public void testFileOperations(File a, int b) {
         // 首先检查文件是否存在

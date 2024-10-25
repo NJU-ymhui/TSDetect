@@ -1,0 +1,54 @@
+Start detecting at 2024-10-25T08-50-02:
+
+smell types in tests\resources\author_tests\annotation.java:
+['SmellType.CONDITIONAL_TEST', 'SmellType.GENERAL_FIXTURE', 'SmellType.IGNORED_TEST']
+
+smell types in tests\resources\author_tests\assert.java:
+['SmellType.ASSERTION_ROULETTE', 'SmellType.CONDITIONAL_TEST', 'SmellType.EXCEPTION_HANDLING', 'SmellType.UNKNOWN_TEST']
+
+smell types in tests\resources\author_tests\cond.java:
+['SmellType.CONDITIONAL_TEST', 'SmellType.REDUNDANT_PRINT']
+
+smell types in tests\resources\author_tests\constructor.java:
+['SmellType.CONSTRUCTOR_INITIALIZATION', 'SmellType.REDUNDANT_PRINT']
+
+smell types in tests\resources\author_tests\DatabaseManager.java:
+['SmellType.GENERAL_FIXTURE', 'SmellType.MYSTERY_GUEST']
+
+smell types in tests\resources\author_tests\default_test1.java:
+['SmellType.DEFAULT_TEST']
+
+smell types in tests\resources\author_tests\duplicated_asserts.java:
+['SmellType.DEFAULT_TEST', 'SmellType.DUPLICATE_ASSERT']
+
+smell types in tests\resources\author_tests\exception.java:
+['SmellType.EXCEPTION_HANDLING', 'SmellType.UNKNOWN_TEST']
+
+smell types in tests\resources\author_tests\file.java:
+['SmellType.ASSERTION_ROULETTE', 'SmellType.CONDITIONAL_TEST', 'SmellType.EMPTY_TEST', 'SmellType.GENERAL_FIXTURE', 'SmellType.LAZY_TEST', 'SmellType.MYSTERY_GUEST', 'SmellType.REDUNDANT_PRINT']
+
+smell types in tests\resources\author_tests\lazy_test.java:
+['SmellType.ASSERTION_ROULETTE', 'SmellType.GENERAL_FIXTURE', 'SmellType.MAGIC_NUMBER', 'SmellType.UNKNOWN_TEST']
+
+smell types in tests\resources\author_tests\magic_number.java:
+['SmellType.ASSERTION_ROULETTE', 'SmellType.DEFAULT_TEST', 'SmellType.GENERAL_FIXTURE', 'SmellType.MAGIC_NUMBER']
+
+smell types in tests\resources\author_tests\multi_production_methods_call.java:
+['SmellType.DEFAULT_TEST', 'SmellType.EAGER_TEST', 'SmellType.EMPTY_TEST']
+
+smell types in tests\resources\author_tests\no_assert.java:
+['SmellType.GENERAL_FIXTURE', 'SmellType.UNKNOWN_TEST']
+
+smell types in tests\resources\author_tests\redundant_assert.java:
+['SmellType.ASSERTION_ROULETTE', 'SmellType.DEFAULT_TEST', 'SmellType.REDUNDANT_ASSERTION', 'SmellType.REDUNDANT_PRINT']
+
+smell types in tests\resources\author_tests\thread_sleep.java:
+['SmellType.ASSERTION_ROULETTE', 'SmellType.REDUNDANT_ASSERTION', 'SmellType.SLEEPY_TEST']
+
+smell types in tests\resources\author_tests\used_unused.java:
+['SmellType.DEFAULT_TEST', 'SmellType.EMPTY_TEST', 'SmellType.GENERAL_FIXTURE', 'SmellType.IGNORED_TEST']
+
+smell types in tests\resources\author_tests\User.java:
+['SmellType.CONDITIONAL_TEST', 'SmellType.CONSTRUCTOR_INITIALIZATION', 'SmellType.REDUNDANT_PRINT']
+
+End detecting at 2024-10-25T08-50-02f

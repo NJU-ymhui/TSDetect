@@ -70,7 +70,10 @@ class LazyTestInspection(Inspection):
                 body = get_class_body(node)
                 for child in body.children:  # 遍历类主体的各个子节点
                     if child.type == 'method_declaration':
-                        self.__method_decl_name = child.children[2].text
+                        if child.children[0].type == 'modifiers':
+                            self.__method_decl_name = child.children[2].text
+                        else:
+                            self.__method_decl_name = child.children[1].text
                         self.__invocation_cnt = 0
                         block = get_method_body(child)  # 方法的主体
                         if block is None:
