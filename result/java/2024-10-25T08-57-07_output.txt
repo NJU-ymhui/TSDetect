@@ -1,4 +1,4 @@
-Start detecting at 2024-10-25T08-50-02:
+Start detecting at 2024-10-25T08-57-07:
 
 smell types in tests\resources\author_tests\annotation.java:
 ['SmellType.CONDITIONAL_TEST', 'SmellType.GENERAL_FIXTURE', 'SmellType.IGNORED_TEST']
@@ -51,4 +51,4 @@ smell types in tests\resources\author_tests\used_unused.java:
 smell types in tests\resources\author_tests\User.java:
 ['SmellType.CONDITIONAL_TEST', 'SmellType.CONSTRUCTOR_INITIALIZATION', 'SmellType.REDUNDANT_PRINT']
 
-End detecting at 2024-10-25T08-50-02f
+End detecting at 2024-10-25T08-57-15f

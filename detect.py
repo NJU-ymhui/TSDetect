@@ -131,7 +131,8 @@ def main(directory, author_test=False):
 if __name__ == "__main__":
     path = "tests\\resources"
     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    output_path = "result\\" + now + "_output.txt"
+    output_path = "result\\java\\" + now + "_output.txt"
+    origin = sys.stdout
     with open(output_path, 'w') as f:
         sys.stdout = f
         print("Start detecting at " + now + ":")
@@ -139,3 +140,5 @@ if __name__ == "__main__":
         main(path, True)
         now = datetime.now().strftime("%Y-%m-%dT%H-%M-%Sf")
         print("End detecting at " + now)
+    sys.stdout = origin
+    print("Detection finished, output file is", output_path)
