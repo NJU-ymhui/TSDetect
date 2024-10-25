@@ -129,20 +129,16 @@ def main(directory, author_test=False):
 
 
 if __name__ == "__main__":
-    try:
-        path = "tests\\resources"
+    path = "tests\\resources"
+    now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    output_path = "result\\java\\" + now + "_output.txt"
+    origin = sys.stdout
+    with open(output_path, 'w') as f:
+        sys.stdout = f
+        print("Start detecting at " + now + ":")
+        print()
+        main(path)
         now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-        output_path = "result\\java\\" + now + "_output.txt"
-        origin = sys.stdout
-        with open(output_path, 'w') as f:
-            sys.stdout = f
-            print("Start detecting at " + now + ":")
-            print()
-            main(path, True)
-            now = datetime.now().strftime("%Y-%m-%dT%H-%M-%Sf")
-            print("End detecting at " + now)
-        sys.stdout = origin
-        print("Detection finished, output file is", output_path)
-    finally:
-        if os.path.exists('build/my-languages.so'):
-            os.remove('build/my-languages.so')
+        print("End detecting at " + now)
+    sys.stdout = origin
+    print("Detection finished, output file is", output_path)

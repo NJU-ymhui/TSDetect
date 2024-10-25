@@ -133,8 +133,8 @@ if __name__ == "__main__":
         sys.stdout = f
         print("Start detecting at " + now + ":")
         print()
-        main(path, True)
-        now = datetime.now().strftime("%Y-%m-%dT%H-%M-%Sf")
+        main(path)
+        now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
         print("End detecting at " + now)
     sys.stdout = origin
     print("Detection finished, output file is", output_path)
