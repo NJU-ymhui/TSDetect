@@ -1,0 +1,15 @@
+Start detecting at 2024-10-25T08-59-22:
+
+smell types in tests\resources\author_tests\go\conditional.go:
+['SmellType.CONDITIONAL_TEST', 'SmellType.REDUNDANT_PRINT', 'SmellType.VERBOSE_TEST']
+
+smell types in tests\resources\author_tests\go\exception.go:
+['SmellType.CONDITIONAL_TEST', 'SmellType.EAGER_TEST', 'SmellType.EXCEPTION_HANDLING', 'SmellType.REDUNDANT_PRINT']
+
+smell types in tests\resources\author_tests\go\file.go:
+['SmellType.ASSERTION_ROULETTE', 'SmellType.CONDITIONAL_TEST', 'SmellType.DUPLICATE_ASSERT']
+
+smell types in tests\resources\author_tests\go\test.go:
+['SmellType.ASSERTION_ROULETTE', 'SmellType.CONDITIONAL_TEST', 'SmellType.DEFAULT_TEST', 'SmellType.DUPLICATE_ASSERT', 'SmellType.EAGER_TEST', 'SmellType.GENERAL_FIXTURE', 'SmellType.LAZY_TEST', 'SmellType.MAGIC_NUMBER', 'SmellType.REDUNDANT_PRINT', 'SmellType.SLEEPY_TEST']
+
+End detecting at 2024-10-25T08-59-29f

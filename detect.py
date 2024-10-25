@@ -22,6 +22,8 @@ from inspections.sleepy_test_inspection import SleepyTestInspection
 from inspections.unknown_test_inspection import UnknownTestInspection
 from inspections.verbose_test_inspection import VerboseTestInspection
 import os
+from datetime import datetime
+import sys
 
 
 def get_parser():
@@ -128,4 +130,16 @@ def main(directory, author_test=False):
 
 if __name__ == "__main__":
     path = "tests\\resources"
-    main(path)
+    now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    output_path = "result\\go\\" + now + "_output.txt"
+    origin = sys.stdout
+    with open(output_path, 'w') as f:
+        sys.stdout = f
+        print("Start detecting at " + now + ":")
+        print()
+        main(path)
+        now = datetime.now().strftime("%Y-%m-%dT%H-%M-%Sf")
+        print("End detecting at " + now)
+    sys.stdout = origin
+    print("Detection finished, output file is", output_path)
+
