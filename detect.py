@@ -137,7 +137,7 @@ if __name__ == "__main__":
         sys.stdout = f
         print("Start detecting at " + now + ":")
         print()
-        main(path, True)
+        main(path)
         now = datetime.now().strftime("%Y-%m-%dT%H-%M-%Sf")
         print("End detecting at " + now)
     sys.stdout = origin
