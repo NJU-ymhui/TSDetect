@@ -29,3 +29,8 @@ If you only need to detect Java or Go, then you can checkout to relative branch 
 The Java Branch is for Java TSDetect only.
 
 The Go Branch is for Go TSDetect only.
+
+## References
+[1] [tsDetect: an open source test smells detection tool](https://doi.org/10.1145/3368089.3417921)
+<br>
+[2] https://github.com/TestSmells/TSDetect
