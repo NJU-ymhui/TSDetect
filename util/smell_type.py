@@ -23,3 +23,7 @@ class SmellType(Enum):
     SLEEPY_TEST = 18,  # 嗜睡测试：测试用例中使用了不稳定的延时方法来同步执行
     UNKNOWN_TEST = 19,  # 未知测试：测试用例没有明确的测试目的
     VERBOSE_TEST = 20  # 冗长测试：测试用例包含过多的输出信息
+    TATE_LEAKAGE = 21,  # 状态泄露，测试用例之间共享状态
+    TEST_RUN_WAR = 22,  # 某些测试分配了临时文件资源，而这些资源也被其他测试使用 TODO 感觉正则匹配写起来过于困难
+    NON_DETERMINISTIC_TEST = 23,  # 测试结果非确定性，测试结果无法确定，可能因为测试代码的随机性
+    MISSING_CLEANUP = 24,  # 测试没有适当地清理自己，导致副作用影响其他测试，造成不稳定的行为

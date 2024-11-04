@@ -21,6 +21,8 @@ from inspections.sensitive_equality_inspection import SensitiveEqualityInspectio
 from inspections.sleepy_test_inspection import SleepyTestInspection
 from inspections.unknown_test_inspection import UnknownTestInspection
 from inspections.verbose_test_inspection import VerboseTestInspection
+from inspections.tate_leakage_inspection import TateLeakageInspection
+from inspections.non_deterministic import NonDeterministicInspection
 import os
 from datetime import datetime
 import sys
@@ -70,6 +72,8 @@ def register_for(inspection_manager):
     sleepy_test_inspection = SleepyTestInspection()
     unknown_test_inspection = UnknownTestInspection()
     verbose_test_inspection = VerboseTestInspection()
+    tate_leakage_inspection = TateLeakageInspection()
+    non_deterministic_inspection = NonDeterministicInspection()
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
@@ -91,6 +95,8 @@ def register_for(inspection_manager):
     inspection_manager.register(sleepy_test_inspection)
     inspection_manager.register(unknown_test_inspection)
     inspection_manager.register(verbose_test_inspection)
+    inspection_manager.register(tate_leakage_inspection)
+    inspection_manager.register(non_deterministic_inspection)
 
 
 def parse(path):
@@ -98,8 +104,8 @@ def parse(path):
     code = generate_code(path)
     tree = get_tree(parser, code)
     visitor = TreeVisitor(tree.root_node)
-    # print("types:")
-    # visitor.check_all_types()
+    print("types:")
+    visitor.check_all_types()
     # print("calls:")
     # visitor.check_method_call()
     # print("decls:")
@@ -133,12 +139,13 @@ if __name__ == "__main__":
     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     output_path = "result\\java\\" + now + "_output.txt"
     origin = sys.stdout
-    with open(output_path, 'w') as f:
-        sys.stdout = f
-        print("Start detecting at " + now + ":")
-        print()
-        main(path)
-        now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-        print("End detecting at " + now)
-    sys.stdout = origin
-    print("Detection finished, output file is", output_path)
+    main(path, True)
+    # with open(output_path, 'w') as f:
+    #     sys.stdout = f
+    #     print("Start detecting at " + now + ":")
+    #     print()
+    #     main(path, True)
+    #     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    #     print("End detecting at " + now)
+    # sys.stdout = origin
+    # print("Detection finished, output file is", output_path)
