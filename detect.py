@@ -104,8 +104,8 @@ def parse(path):
     code = generate_code(path)
     tree = get_tree(parser, code)
     visitor = TreeVisitor(tree.root_node)
-    print("types:")
-    visitor.check_all_types()
+    # print("types:")
+    # visitor.check_all_types()
     # print("calls:")
     # visitor.check_method_call()
     # print("decls:")
@@ -139,13 +139,13 @@ if __name__ == "__main__":
     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     output_path = "result\\java\\" + now + "_output.txt"
     origin = sys.stdout
-    main(path, True)
-    # with open(output_path, 'w') as f:
-    #     sys.stdout = f
-    #     print("Start detecting at " + now + ":")
-    #     print()
-    #     main(path, True)
-    #     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    #     print("End detecting at " + now)
-    # sys.stdout = origin
-    # print("Detection finished, output file is", output_path)
+    # main(path, True)
+    with open(output_path, 'w') as f:
+        sys.stdout = f
+        print("Start detecting at " + now + ":")
+        print()
+        main(path)
+        now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+        print("End detecting at " + now)
+    sys.stdout = origin
+    print("Detection finished, output file is", output_path)
