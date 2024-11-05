@@ -16,7 +16,6 @@ class TateLeakageInspection(Inspection):
 
     def __visit_block(self, block):
         for child in block.children:
-            print(child.type)
             if child.type == 'assignment_expression':
                 # 赋值表达式, 下标0是左值
                 l_val = child.children[0].text

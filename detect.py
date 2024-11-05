@@ -23,6 +23,7 @@ from inspections.unknown_test_inspection import UnknownTestInspection
 from inspections.verbose_test_inspection import VerboseTestInspection
 from inspections.tate_leakage_inspection import TateLeakageInspection
 from inspections.non_deterministic import NonDeterministicInspection
+from inspections.test_run_war_inspection import TestRunWarInspection
 import os
 from datetime import datetime
 import sys
@@ -74,6 +75,7 @@ def register_for(inspection_manager):
     verbose_test_inspection = VerboseTestInspection()
     tate_leakage_inspection = TateLeakageInspection()
     non_deterministic_inspection = NonDeterministicInspection()
+    test_run_war_inspection = TestRunWarInspection()
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
@@ -97,6 +99,7 @@ def register_for(inspection_manager):
     inspection_manager.register(verbose_test_inspection)
     inspection_manager.register(tate_leakage_inspection)
     inspection_manager.register(non_deterministic_inspection)
+    inspection_manager.register(test_run_war_inspection)
 
 
 def parse(path):
