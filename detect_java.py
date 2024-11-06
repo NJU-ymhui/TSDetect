@@ -21,6 +21,10 @@ from inspections.java.sensitive_equality_inspection import SensitiveEqualityInsp
 from inspections.java.sleepy_test_inspection import SleepyTestInspection
 from inspections.java.unknown_test_inspection import UnknownTestInspection
 from inspections.java.verbose_test_inspection import VerboseTestInspection
+from inspections.java.test_run_war_inspection import TestRunWarInspection
+from inspections.java.non_deterministic import NonDeterministicInspection
+from inspections.java.tate_leakage_inspection import TateLeakageInspection
+from inspections.java.missing_cleanup_inspection import MissingCleanupInspection
 import os
 from datetime import datetime
 import sys
@@ -73,6 +77,7 @@ def register_for(inspection_manager):
     tate_leakage_inspection = TateLeakageInspection()
     non_deterministic_inspection = NonDeterministicInspection()
     test_run_war_inspection = TestRunWarInspection()
+    missing_cleanup_inspection = MissingCleanupInspection()
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
@@ -97,6 +102,7 @@ def register_for(inspection_manager):
     inspection_manager.register(tate_leakage_inspection)
     inspection_manager.register(non_deterministic_inspection)
     inspection_manager.register(test_run_war_inspection)
+    inspection_manager.register(missing_cleanup_inspection)
 
 
 def parse(path):
