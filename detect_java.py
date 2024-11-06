@@ -70,6 +70,9 @@ def register_for(inspection_manager):
     sleepy_test_inspection = SleepyTestInspection()
     unknown_test_inspection = UnknownTestInspection()
     verbose_test_inspection = VerboseTestInspection()
+    tate_leakage_inspection = TateLeakageInspection()
+    non_deterministic_inspection = NonDeterministicInspection()
+    test_run_war_inspection = TestRunWarInspection()
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
@@ -91,6 +94,9 @@ def register_for(inspection_manager):
     inspection_manager.register(sleepy_test_inspection)
     inspection_manager.register(unknown_test_inspection)
     inspection_manager.register(verbose_test_inspection)
+    inspection_manager.register(tate_leakage_inspection)
+    inspection_manager.register(non_deterministic_inspection)
+    inspection_manager.register(test_run_war_inspection)
 
 
 def parse(path):

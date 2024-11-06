@@ -23,4 +23,10 @@ public class FileTest {
         assertTrue("File is not a regular file.", testFile.isFile());
         System.out.println("Performing operations on the file...");
     }
+
+//     @Test
+//     public void testFileOperations2() {
+//         File t = new File("test.txt")
+//         t.close();
+//     }
 }
