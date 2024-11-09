@@ -24,6 +24,9 @@ class Inspection(ABC):
         """访问某个节点"""
         pass
 
+    def logs_info(self):
+        return False
+
     def clean(self):
         """清除smell状态"""
         self.smell = False

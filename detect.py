@@ -24,6 +24,8 @@ from inspections.java.verbose_test_inspection import VerboseTestInspection
 from inspections.java.tate_leakage_inspection import TateLeakageInspection
 from inspections.java.non_deterministic import NonDeterministicInspection
 from inspections.java.test_run_war_inspection import TestRunWarInspection
+from inspections.java.verbose_variable_inspection import VerboseVariableInspection
+from inspections.java.logs_inspection import LogsInspection
 import os
 from datetime import datetime
 import sys
@@ -76,6 +78,8 @@ def register_for(inspection_manager):
     tate_leakage_inspection = TateLeakageInspection()
     non_deterministic_inspection = NonDeterministicInspection()
     test_run_war_inspection = TestRunWarInspection()
+    verbose_variable_inspection = VerboseVariableInspection()
+    logs_inspection = LogsInspection()
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
@@ -100,6 +104,8 @@ def register_for(inspection_manager):
     inspection_manager.register(tate_leakage_inspection)
     inspection_manager.register(non_deterministic_inspection)
     inspection_manager.register(test_run_war_inspection)
+    inspection_manager.register(verbose_variable_inspection)
+    inspection_manager.register(logs_inspection)
 
 
 def parse(path):
@@ -123,6 +129,9 @@ def parse(path):
     visitor.parse()  # 遍历语法树解析
     print("smell types in", path, end=":\n")
     print(inspection_manager.get_smells())  # 查看所有smell
+    if inspection_manager.has_logs_inspection():
+        print("Total of logs in this test file:", inspection_manager.get_logs_num())
+    print("Total of line comments in this test file:", visitor.get_comments_cnt())
     print()
 
 
