@@ -37,6 +37,8 @@ class TreeVisitor:
 
     def __check_all_types_helper(self, node):
         for child in node.children:
+            if child.type == 'variable_declarator':
+                print("------", child.parent.children[0].text, "------")
             print(child.type + ":", child.text)
             self.__check_all_types_helper(child)
 
