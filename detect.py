@@ -17,6 +17,8 @@ from inspections.go.resource_optimism_inspection import ResourceOptimismInspecti
 from inspections.go.sleepy_test_inspection import SleepyTestInspection
 from inspections.go.unknown_test_inspection import UnknownTestInspection
 from inspections.go.verbose_test_inspection import VerboseTestInspection
+from inspections.go.logs_inspection import LogsInspection
+from inspections.go.tate_leakage_inspection import TATELeakageInspection
 import os
 from datetime import datetime
 import sys
@@ -66,6 +68,8 @@ def register_for(inspection_manager):
     sleepy_test_inspection = SleepyTestInspection()
     unknown_test_inspection = UnknownTestInspection()
     verbose_test_inspection = VerboseTestInspection()
+    logs_inspection = LogsInspection()
+    tate_leakage_inspection = TATELeakageInspection()
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
@@ -87,6 +91,8 @@ def register_for(inspection_manager):
     inspection_manager.register(sleepy_test_inspection)
     inspection_manager.register(unknown_test_inspection)
     inspection_manager.register(verbose_test_inspection)
+    inspection_manager.register(logs_inspection)
+    inspection_manager.register(tate_leakage_inspection)
 
 
 def parse(path):
@@ -133,7 +139,7 @@ if __name__ == "__main__":
         sys.stdout = f
         print("Start detecting at " + now + ":")
         print()
-        main(path)
+        main(path, True)
         now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
         print("End detecting at " + now)
     sys.stdout = origin

@@ -2,6 +2,7 @@ class TreeVisitor:
     def __init__(self, root):
         self.root = root
         self.inspection_manager = None
+        self.__comments_cnt = 0
 
     def __print_statements_helper(self, node):
         for child in node.children:
@@ -50,6 +51,7 @@ class TreeVisitor:
     def __parse_helper(self, node):
         for child in node.children:
             if child.type == 'comment':  # go的注释
+                self.__comments_cnt += 1
                 continue
             self.inspection_manager.visit(child)
             self.__parse_helper(child)
@@ -61,6 +63,8 @@ class TreeVisitor:
         if self.inspection_manager is None:
             print("Error!")
             raise Exception("Please register an inspection manager before parsing")
+        self.__comments_cnt = 0
         self.__parse_helper(self.root)
 
-
+    def get_comments_cnt(self):
+        return self.__comments_cnt
