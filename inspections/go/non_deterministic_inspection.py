@@ -13,5 +13,13 @@ class NonDeterministicInspection(Inspection):
         return self.smell
 
     def visit(self, node):
-        # TODO
-        return
+        if self.smell:
+            return
+        if node.type == 'call_expression' and node.children[0].type == 'selector_expression':
+            call = node.children[0]  # selector_expression对应的节点 比如fmt.Println
+            if call.children[0].text == b'rand':
+                self.smell = True
+                return
+            if call.text == b'time.Sleep':
+                self.smell = True
+                return

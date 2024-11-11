@@ -24,7 +24,7 @@ class SmellType(Enum):
     UNKNOWN_TEST = 19,  # 未知测试：测试用例没有明确的测试目的
     VERBOSE_TEST = 20  # 冗长测试：测试用例包含过多的输出信息
     TATE_LEAKAGE = 21,  # 状态泄露，测试用例之间共享状态
-    TEST_RUN_WAR = 22,  # 某些测试分配了临时文件资源，而这些资源也被其他测试使用 TODO
-    NON_DETERMINISTIC_TEST = 23,  # 测试结果非确定性，测试结果无法确定，可能因为测试代码的随机性 TODO
-    VERBOSE_VARIABLE = 24  # 冗长变量，测试用例中包含过多的变量 TODO
+    TEST_RUN_WAR = 22,  # 某些测试分配了临时文件资源，而这些资源也被其他测试使用
+    NON_DETERMINISTIC_TEST = 23,  # 测试结果非确定性，测试结果无法确定，可能因为测试代码的随机性
+    VERBOSE_VARIABLE = 24  # 冗长变量，测试用例中包含过多的变量
     LOGS_EXISTS = 25  # 严格意义上这个不是smell，但为了统一也写在这里，主要用来标记存在日志输出语句可以查看数目
