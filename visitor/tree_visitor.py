@@ -52,7 +52,7 @@ class TreeVisitor:
 
     def __parse_helper(self, node):
         for child in node.children:
-            if child.type == 'line_comment':
+            if child.type == 'line_comment' or child.type == 'comment':
                 self.__comments_cnt += 1
                 continue
             self.__inspection_manager.visit(child)

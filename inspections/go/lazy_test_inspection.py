@@ -1,6 +1,6 @@
 from inspections.inspection import Inspection
 from util.smell_type import SmellType
-from util.go.util import get_method_body, is_test_func
+from util.go.util import get_method_body, index_of, get_class_body, get_class_name, is_test_class, is_test_func, is_print
 
 
 class LazyTestInspection(Inspection):

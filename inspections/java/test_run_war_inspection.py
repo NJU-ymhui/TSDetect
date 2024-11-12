@@ -29,3 +29,4 @@ class TestRunWarInspection(Inspection):
                 else:
                     self.__file_args.append(file_path)
         return
+

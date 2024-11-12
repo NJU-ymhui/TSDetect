@@ -22,3 +22,4 @@ class SensitiveEqualityInspection(Inspection):
                     self.smell = True
                     return
         return
+

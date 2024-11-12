@@ -32,3 +32,4 @@ class EmptyMethodInspection(Inspection):
             else:
                 return False
         return True
+

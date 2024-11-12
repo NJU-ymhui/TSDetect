@@ -18,7 +18,8 @@ class VerboseTestInspection(Inspection):
     def visit(self, node):
         if self.smell:
             return
-        if is_method_decl(node, 'go'):
-            # print(":::", count_statements(node, 'go'))
-            self.smell = count_statements(node, 'go') > self.__max_statements
+        if is_method_decl(node):
+            # print(":::", count_statements(node))
+            self.smell = count_statements(node) > self.__max_statements
         return
+

@@ -1,27 +1,27 @@
 from tree_sitter import Language, Parser
 from visitor.tree_visitor import TreeVisitor
 from inspection_manager.inspection_manager import InspectionManager
-from inspections.assertion_roulette_inspection import AssertionRouletteInspection
-from inspections.conditional_test_logic_inspection import ConditionalTestLogicInspection
-from inspections.default_test_inspection import DefaultTestInspection
-from inspections.duplicate_assert_inspection import DuplicateAssertInspection
-from inspections.eager_test_inspection import EagerTestInspection
-from inspections.empty_method_inspection import EmptyMethodInspection
-from inspections.exception_handling_inspection import ExceptionHandlingInspection
-from inspections.general_fixture_inspection import GeneralFixtureInspection
-from inspections.lazy_test_inspection import LazyTestInspection
-from inspections.magic_number_inspection import MagicNumberInspection
-from inspections.mystery_guest_inspection import MysteryGuestInspection
-from inspections.redundant_print_inspection import RedundantPrintInspection
-from inspections.resource_optimism_inspection import ResourceOptimismInspection
-from inspections.sleepy_test_inspection import SleepyTestInspection
-from inspections.unknown_test_inspection import UnknownTestInspection
-from inspections.verbose_test_inspection import VerboseTestInspection
-from inspections.logs_inspection import LogsInspection
-from inspections.tate_leakage_inspection import TATELeakageInspection
-from inspections.test_run_war_inspection import TestRunWarInspection
-from inspections.non_deterministic_inspection import NonDeterministicInspection
-from inspections.verbose_variable_inspection import VerboseVariableInspection
+from inspections.go.assertion_roulette_inspection import AssertionRouletteInspection
+from inspections.go.conditional_test_logic_inspection import ConditionalTestLogicInspection
+from inspections.go.default_test_inspection import DefaultTestInspection
+from inspections.go.duplicate_assert_inspection import DuplicateAssertInspection
+from inspections.go.eager_test_inspection import EagerTestInspection
+from inspections.go.empty_method_inspection import EmptyMethodInspection
+from inspections.go.exception_handling_inspection import ExceptionHandlingInspection
+from inspections.go.general_fixture_inspection import GeneralFixtureInspection
+from inspections.go.lazy_test_inspection import LazyTestInspection
+from inspections.go.magic_number_inspection import MagicNumberInspection
+from inspections.go.mystery_guest_inspection import MysteryGuestInspection
+from inspections.go.redundant_print_inspection import RedundantPrintInspection
+from inspections.go.resource_optimism_inspection import ResourceOptimismInspection
+from inspections.go.sleepy_test_inspection import SleepyTestInspection
+from inspections.go.unknown_test_inspection import UnknownTestInspection
+from inspections.go.verbose_test_inspection import VerboseTestInspection
+from inspections.go.logs_inspection import LogsInspection
+from inspections.go.tate_leakage_inspection import TATELeakageInspection
+from inspections.go.test_run_war_inspection import TestRunWarInspection
+from inspections.go.non_deterministic_inspection import NonDeterministicInspection
+from inspections.go.verbose_variable_inspection import VerboseVariableInspection
 import os
 from datetime import datetime
 import sys
@@ -151,7 +151,7 @@ if __name__ == "__main__":
         sys.stdout = f
         print("Start detecting at " + now + ":")
         print()
-        main(path)
+        main(path, True)
         now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
         print("End detecting at " + now)
     sys.stdout = origin

@@ -45,4 +45,3 @@ class TateLeakageInspection(Inspection):
                     block = get_method_body(node)
                     self.__visit_block(block)
                     return
-

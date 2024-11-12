@@ -18,3 +18,4 @@ class ConstructorInitializationInspection(Inspection):
         if node.type == "constructor_declaration":
             self.smell = True
             return
+

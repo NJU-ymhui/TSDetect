@@ -19,3 +19,4 @@ class ConditionalTestLogicInspection(Inspection):
         if node.type in self.__match_stmts:
             self.smell = True
             return
+

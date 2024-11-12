@@ -6,7 +6,7 @@ class EagerTestInspection(Inspection):
     def __init__(self):
         super().__init__()
         self.__freq = {}  # 生产函数调用次数
-        self.__decls = []  # 加入该列表前判断是否在calls中出现过，因为Java允许先使用后声明
+        self.__decls = []
 
     def get_smell_type(self):
         return SmellType.EAGER_TEST
