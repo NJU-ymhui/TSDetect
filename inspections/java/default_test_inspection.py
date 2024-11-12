@@ -21,3 +21,4 @@ class DefaultTestInspection(Inspection):
         match = re.search(self.__pattern, text)
         self.smell = match
         return
+

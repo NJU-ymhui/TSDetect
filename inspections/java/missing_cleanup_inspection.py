@@ -24,3 +24,4 @@ class MissingCleanupInspection(Inspection):
                 self.__before = True
             elif node.text == b'@After':
                 self.__after = True
+

@@ -20,4 +20,3 @@ class RedundantPrintInspection(Inspection):
             self.smell = is_print(node.text)
             return
         return
-

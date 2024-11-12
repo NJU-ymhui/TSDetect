@@ -32,3 +32,4 @@ class DuplicateAssertInspection(Inspection):
                 else:
                     args_list = [args]
                     self.__asserts_args[func_name] = args_list
+

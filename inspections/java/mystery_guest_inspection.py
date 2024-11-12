@@ -32,3 +32,4 @@ class MysteryGuestInspection(Inspection):
             self.smell = node.text in self.__mystery_guests
             return
         return
+

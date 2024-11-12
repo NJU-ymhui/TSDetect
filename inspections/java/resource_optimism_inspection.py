@@ -83,3 +83,4 @@ class ResourceOptimismInspection(Inspection):
                             checked_list.append(callee)
                             self.__checked_files[0] = checked_list
         return
+

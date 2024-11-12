@@ -69,3 +69,4 @@ class GeneralFixtureInspection(Inspection):
                     self.__local_vars[node.text] += 1
                 elif node.text in self.__global_vars.keys():
                     self.__global_vars[node.text] += 1
+

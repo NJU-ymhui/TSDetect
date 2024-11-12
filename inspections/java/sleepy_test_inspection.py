@@ -27,3 +27,4 @@ class SleepyTestInspection(Inspection):
                 if self.smell:
                     return
         return
+

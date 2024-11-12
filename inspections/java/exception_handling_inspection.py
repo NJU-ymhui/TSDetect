@@ -19,3 +19,4 @@ class ExceptionHandlingInspection(Inspection):
             self.smell = True
             return
         return
+

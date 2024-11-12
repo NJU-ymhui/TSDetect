@@ -124,3 +124,4 @@ class EagerTestInspection(Inspection):
                                 if self.smell:
                                     return
                                 self.__visit_method_invocation_4_non_test(statement)
+

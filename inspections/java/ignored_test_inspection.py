@@ -23,3 +23,4 @@ class IgnoredTestInspection(Inspection):
             self.smell = ignore_annotation(text)
             return
         return
+

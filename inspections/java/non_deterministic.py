@@ -24,3 +24,4 @@ class NonDeterministicInspection(Inspection):
             if b'.' in node.text and node.children[0].text == b'Thread':  # 第一个节点是类
                 self.smell = True
                 return
+

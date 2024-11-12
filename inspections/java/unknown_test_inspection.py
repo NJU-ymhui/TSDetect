@@ -33,3 +33,4 @@ class UnknownTestInspection(Inspection):
             self.smell = not self.__visit_children(node)
             return
         return
+

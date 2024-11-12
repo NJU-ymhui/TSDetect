@@ -21,6 +21,6 @@ class VerboseVariableInspection(Inspection):
             self.cnt = 0
         if node.type == 'variable_declarator':
             self.cnt += 1
-            if self.cnt >= self.limits:
+            if self.cnt >= self.limits: 
                 self.smell = True
                 return

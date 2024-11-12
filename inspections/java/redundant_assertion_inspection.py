@@ -31,3 +31,4 @@ class RedundantAssertionInspection(Inspection):
                                 self.smell = True
                                 return
         return
+

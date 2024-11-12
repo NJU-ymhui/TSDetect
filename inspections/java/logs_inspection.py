@@ -23,3 +23,4 @@ class LogsInspection(Inspection):
     def visit(self, node):
         if node.type == 'method_invocation' and True in [node.text.startswith(call) for call in self.__logs]:
             self.__logs_tot += 1
+

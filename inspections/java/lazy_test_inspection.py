@@ -37,3 +37,4 @@ class LazyTestInspection(Inspection):
                     return
             self.__calls.append(func_name)
         return
+

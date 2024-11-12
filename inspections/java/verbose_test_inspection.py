@@ -22,3 +22,4 @@ class VerboseTestInspection(Inspection):
             # print(":::", count_statements(node))
             self.smell = count_statements(node) > self.__max_statements
         return
+
