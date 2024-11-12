@@ -1,6 +1,6 @@
 from util.smell_type import SmellType
 from inspections.inspection import Inspection
-from util.util import get_method_body
+from util.java.util import get_method_body
 
 
 class TateLeakageInspection(Inspection):
