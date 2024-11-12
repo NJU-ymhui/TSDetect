@@ -24,5 +24,5 @@ class LogsInspection(Inspection):
                 self.smell = True
                 self.__logs_cnt += 1
 
-    def get_logs_cnt(self):
+    def get_logs_num(self):
         return self.__logs_cnt

@@ -125,8 +125,8 @@ def parse(path):
     visitor.parse()  # 遍历语法树解析
     print("smell types in", path, end=":\n")
     print(inspection_manager.get_smells())  # 查看所有smell
-    if inspection_manager.get_logs_info():
-        print('Total of logs in this test file:', inspection_manager.get_logs_cnt())
+    if inspection_manager.has_logs_inspection():
+        print('Total of logs in this test file:', inspection_manager.get_logs_num())
     print('Total of comments in this test file:', visitor.get_comments_cnt())
     print()
 
