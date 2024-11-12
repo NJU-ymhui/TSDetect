@@ -8,7 +8,7 @@ class AssertionRouletteInspection(Inspection):
         self.__one_param_assert = [b'fail']
         self.__two_params_assert = [b'assertTrue', b'assertFalse', b'assertNull', b'assertNotNull', b'assertThat']
         self.__three_params_assert = [b'assertEquals', b'assertNotEquals', b'assertArrayEquals', b'assertNotSame',
-                                    b'assertSame', b'assertThrows']
+                                      b'assertSame', b'assertThrows']
 
     def get_smell_type(self):
         return SmellType.ASSERTION_ROULETTE

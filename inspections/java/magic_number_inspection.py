@@ -7,8 +7,8 @@ class MagicNumberInspection(Inspection):
     def __init__(self):
         super().__init__()
         self.__assert_functions = [b'assertTrue', b'assertFalse', b'assertNotNull', b'assertNull',
-                                 b'assertArrayEquals', b'assertEquals', b'assertNotSame', b'assertSame',
-                                 b'assertThrows', b'assertNotEquals', b'assertThat']
+                                   b'assertArrayEquals', b'assertEquals', b'assertNotSame', b'assertSame',
+                                   b'assertThrows', b'assertNotEquals', b'assertThat']
 
     def get_smell_type(self):
         return SmellType.MAGIC_NUMBER
