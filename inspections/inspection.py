@@ -31,4 +31,7 @@ class Inspection(ABC):
         """清除smell状态"""
         self.smell = False
 
+    def logs_info(self):
+        return False
+
 

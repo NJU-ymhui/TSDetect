@@ -16,8 +16,8 @@ class RedundantPrintInspection(Inspection):
     def visit(self, node):
         if self.smell:
             return
-        if node.type == 'method_invocation':
-            self.smell = is_print(node.text)
+        if node.type == 'selector_expression':
+            self.smell = is_print(node.text, 'go')
             return
         return
 

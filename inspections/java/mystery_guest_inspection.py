@@ -5,19 +5,8 @@ from util.smell_type import SmellType
 class MysteryGuestInspection(Inspection):
     def __init__(self):
         super().__init__()
-        self.__mystery_guests = [
-            b"Context",
-            b"Cursor",
-            b"File",
-            b"FileOutputStream",
-            b"HttpClient",
-            b"HttpResponse",
-            b"HttpPost",
-            b"HttpGet",
-            b"SoapObject",
-            b"SQLiteOpenHelper",
-            b"SQLiteDatabase"
-        ]
+        # go中类似java的神秘来客只有os.File, net/http包和一个GitHub的数据库项目github.com/mattn/go-sqlite3
+        self.__mystery_guests = [b'"os"', b'"net/http"', b'"github.com/mattn/go-sqlite3"']
 
     def get_smell_type(self):
         return SmellType.MYSTERY_GUEST
@@ -28,7 +17,7 @@ class MysteryGuestInspection(Inspection):
     def visit(self, node):
         if self.smell:
             return
-        if node.type == 'type_identifier':
+        if node.type == 'import_spec':
             self.smell = node.text in self.__mystery_guests
             return
         return

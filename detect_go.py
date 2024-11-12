@@ -1,22 +1,27 @@
 from tree_sitter import Language, Parser
 from visitor.tree_visitor import TreeVisitor
 from inspection_manager.inspection_manager import InspectionManager
-from inspections.go.assertion_roulette_inspection import AssertionRouletteInspection
-from inspections.go.conditional_test_logic_inspection import ConditionalTestLogicInspection
-from inspections.go.default_test_inspection import DefaultTestInspection
-from inspections.go.duplicate_assert_inspection import DuplicateAssertInspection
-from inspections.go.eager_test_inspection import EagerTestInspection
-from inspections.go.empty_method_inspection import EmptyMethodInspection
-from inspections.go.exception_handling_inspection import ExceptionHandlingInspection
-from inspections.go.general_fixture_inspection import GeneralFixtureInspection
-from inspections.go.lazy_test_inspection import LazyTestInspection
-from inspections.go.magic_number_inspection import MagicNumberInspection
-from inspections.go.mystery_guest_inspection import MysteryGuestInspection
-from inspections.go.redundant_print_inspection import RedundantPrintInspection
-from inspections.go.resource_optimism_inspection import ResourceOptimismInspection
-from inspections.go.sleepy_test_inspection import SleepyTestInspection
-from inspections.go.unknown_test_inspection import UnknownTestInspection
-from inspections.go.verbose_test_inspection import VerboseTestInspection
+from inspections.assertion_roulette_inspection import AssertionRouletteInspection
+from inspections.conditional_test_logic_inspection import ConditionalTestLogicInspection
+from inspections.default_test_inspection import DefaultTestInspection
+from inspections.duplicate_assert_inspection import DuplicateAssertInspection
+from inspections.eager_test_inspection import EagerTestInspection
+from inspections.empty_method_inspection import EmptyMethodInspection
+from inspections.exception_handling_inspection import ExceptionHandlingInspection
+from inspections.general_fixture_inspection import GeneralFixtureInspection
+from inspections.lazy_test_inspection import LazyTestInspection
+from inspections.magic_number_inspection import MagicNumberInspection
+from inspections.mystery_guest_inspection import MysteryGuestInspection
+from inspections.redundant_print_inspection import RedundantPrintInspection
+from inspections.resource_optimism_inspection import ResourceOptimismInspection
+from inspections.sleepy_test_inspection import SleepyTestInspection
+from inspections.unknown_test_inspection import UnknownTestInspection
+from inspections.verbose_test_inspection import VerboseTestInspection
+from inspections.logs_inspection import LogsInspection
+from inspections.tate_leakage_inspection import TATELeakageInspection
+from inspections.test_run_war_inspection import TestRunWarInspection
+from inspections.non_deterministic_inspection import NonDeterministicInspection
+from inspections.verbose_variable_inspection import VerboseVariableInspection
 import os
 from datetime import datetime
 import sys
@@ -66,6 +71,11 @@ def register_for(inspection_manager):
     sleepy_test_inspection = SleepyTestInspection()
     unknown_test_inspection = UnknownTestInspection()
     verbose_test_inspection = VerboseTestInspection()
+    logs_inspection = LogsInspection()
+    tate_leakage_inspection = TATELeakageInspection()
+    test_run_war_inspection = TestRunWarInspection()
+    non_deterministic_inspection = NonDeterministicInspection()
+    verbose_variable_inspection = VerboseVariableInspection()
 
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
@@ -87,6 +97,11 @@ def register_for(inspection_manager):
     inspection_manager.register(sleepy_test_inspection)
     inspection_manager.register(unknown_test_inspection)
     inspection_manager.register(verbose_test_inspection)
+    inspection_manager.register(logs_inspection)
+    inspection_manager.register(tate_leakage_inspection)
+    inspection_manager.register(test_run_war_inspection)
+    inspection_manager.register(non_deterministic_inspection)
+    inspection_manager.register(verbose_variable_inspection)
 
 
 def parse(path):
@@ -110,6 +125,9 @@ def parse(path):
     visitor.parse()  # 遍历语法树解析
     print("smell types in", path, end=":\n")
     print(inspection_manager.get_smells())  # 查看所有smell
+    if inspection_manager.has_logs_inspection():
+        print('Total of logs in this test file:', inspection_manager.get_logs_num())
+    print('Total of comments in this test file:', visitor.get_comments_cnt())
     print()
 
 
@@ -138,5 +156,4 @@ if __name__ == "__main__":
         print("End detecting at " + now)
     sys.stdout = origin
     print("Detection finished, output file is", output_path)
-
 

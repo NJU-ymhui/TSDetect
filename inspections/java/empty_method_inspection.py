@@ -6,7 +6,7 @@ from util.java.util import get_method_body
 class EmptyMethodInspection(Inspection):
     def __init__(self):
         super().__init__()
-        self.__skip_list = ['{', '}', 'line_comment']  # 事实上根据协议line_comment在visit时就会跳过
+        self.__skip_list = ['{', '}', 'line_comment', 'comment']  # 事实上根据协议line_comment在visit时就会跳过
 
     def get_smell_type(self):
         return SmellType.EMPTY_TEST
@@ -17,8 +17,8 @@ class EmptyMethodInspection(Inspection):
     def visit(self, node):
         if self.smell:
             return
-        if node.type == 'method_declaration':  # constructor_declaration不在考虑范围内，即它可以为空
-            block = get_method_body(node)
+        if node.type == 'function_declaration':  # constructor_declaration不在考虑范围内，即它可以为空
+            block = get_method_body(node, language='go')
             if block is None:
                 return
             self.smell = self.__check_is_empty_block(block)
