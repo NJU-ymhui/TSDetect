@@ -1,12 +1,25 @@
 from inspections.inspection import Inspection
 from util.smell_type import SmellType
+from util.util import get_method_body, index_of, get_class_body, get_class_name, is_test_class, is_test_func, is_print
 
 
 class EagerTestInspection(Inspection):
-    def __init__(self):
+    # eager test指在同一个测试方法里测试了多个待测函数
+    # 这个想要准确检验必须接受待测源代码文件，解析其中的待测函数
+    def __init__(self, max_calls=4, src_file_root=None):
         super().__init__()
-        self.__freq = {}  # 生产函数调用次数
-        self.__decls = []  # 加入该列表前判断是否在calls中出现过，因为Java允许先使用后声明
+        self.__lazy_candidates = []
+        self.__invocation_cnt = 0
+        self.__method_decl_name = b''
+        self.__max_calls = max_calls  # 最多调用的方法数，若超过则认为可能存在潜在的smell
+        self.__func_tobe_test = []
+        self.__cur_tested = b''
+        if src_file_root is not None:
+            # 这里初始化识别所有待测函数
+            for child in src_file_root.children:
+                if child.type == 'function_declaration':
+                    name = child.children[1].text
+                    self.__func_tobe_test.append(name)
 
     def get_smell_type(self):
         return SmellType.EAGER_TEST
@@ -14,21 +27,72 @@ class EagerTestInspection(Inspection):
     def has_smell(self):
         return self.smell
 
+    def __visit_4_test(self, node):
+        # 测试函数满足smell置true
+        if self.smell:
+            return
+        for child in node.children:
+            if self.smell:
+                return
+            if child is None:
+                return
+            if child.type == 'call_expression':
+                if child.children[0].type == 'identifier':
+                    # child.children[0].text为函数名
+                    name = child.children[0].text
+                    if name in self.__lazy_candidates:
+                        self.smell = True
+                        return
+                    else:
+                        if name in self.__func_tobe_test:
+                            # 可能引入smell
+                            if self.__cur_tested == b'':
+                                self.__cur_tested = name
+                            elif self.__cur_tested != name:
+                                self.smell = True
+                                return
+            self.__visit_4_test(child)
+
+    def __visit_4_non_test(self, node, func_name):
+        # 非测试函数若满足条件加入候选
+        if func_name in self.__lazy_candidates:
+            return
+        for child in node.children:
+            if func_name in self.__lazy_candidates:
+                return
+            if child is None:
+                return
+            if child.type == 'call_expression':
+                if child.children[0].type == 'identifier':
+                    # child.children[0].text为函数名
+                    name = child.children[0].text
+                    if name in self.__lazy_candidates:
+                        self.__lazy_candidates.append(func_name)
+                        return
+                    if name in self.__func_tobe_test:
+                        if self.__cur_tested == b'':
+                            self.__cur_tested = name
+                        elif self.__cur_tested != name:
+                            self.__lazy_candidates.append(func_name)
+                            return
+            self.__visit_4_non_test(child, func_name)
+
     def visit(self, node):
         if self.smell:
             return
+        # go确保了函数使用前一定先声明
         if node.type == 'function_declaration':
-            self.__freq = {}
-            # Go下标为1的子节点是函数名  形如 func x
-            method_name = node.children[1].text
-            for func in self.__decls:
-                self.__freq[func] = 0
-            self.__decls.append(method_name)
-        elif node.type == 'call_expression':
-            func_name = node.children[0].text  # 函数调用就两种x.x和x()，取下标为0的内容，若是x.x则肯定匹配不上，若是x()则可能匹配
-            if func_name in self.__freq.keys():  # 不用decls防止递归
-                self.__freq[func_name] += 1
-                if self.__freq[func_name] > 1:
-                    self.smell = True
+            self.__cur_tested = b''
+            if is_test_func(node):
+                block = get_method_body(node, 'go')
+                if block is None:
                     return
-        return
+                self.__visit_4_test(block)
+            else:
+                # 不是测试方法但是引入过多的方法调用，当测试方法调用它时，引入smell
+                block = get_method_body(node, 'go')
+                if block is None:
+                    return
+                func_name = node.children[1].text
+                self.__visit_4_non_test(block, func_name)
+

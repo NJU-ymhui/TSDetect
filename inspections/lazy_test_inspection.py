@@ -1,15 +1,20 @@
 from inspections.inspection import Inspection
 from util.smell_type import SmellType
-from util.util import get_method_body, index_of, get_class_body, get_class_name, is_test_class, is_test_func, is_print
 
 
 class LazyTestInspection(Inspection):
-    def __init__(self, max_calls=4):
+    # lazy test测同一个方法多次
+    def __init__(self, src_file_root=None):
         super().__init__()
-        self.__lazy_candidates = []
-        self.__invocation_cnt = 0
-        self.__method_decl_name = b''
-        self.__max_calls = max_calls  # 最多调用的方法数，若超过则认为可能存在潜在的smell
+        self.__freq = []  # 测试函数及其对应参数
+        self.__is_test = False
+        self.__cur_tested = b''
+        self.__src_tobe_test = []
+        if src_file_root is not None:
+            for child in src_file_root.children:
+                if child.type == 'function_declaration':
+                    name = child.children[1].text
+                    self.__src_tobe_test.append(name)
 
     def get_smell_type(self):
         return SmellType.LAZY_TEST
@@ -17,78 +22,26 @@ class LazyTestInspection(Inspection):
     def has_smell(self):
         return self.smell
 
-    def __visit_4_test(self, node):
-        # 测试函数满足smell置true
-        for child in node.children:
-            if child is None:
-                return
-            if child.type == 'call_expression':
-                if child.children[0].type == 'identifier':
-                    # child.children[0].text为函数名
-                    if child.children[0].text in self.__lazy_candidates:
-                        self.smell = True
-                        return
-                    else:
-                        self.__invocation_cnt += 1
-                        if self.__invocation_cnt > self.__max_calls:
-                            self.smell = True
-                            return
-                elif child.children[0].type == 'selector_expression':
-                    # child.children[0].children[2]为field名即函数名
-                    if child.children[0].children[2].text in self.__lazy_candidates:
-                        self.smell = True
-                        return
-                    else:
-                        self.__invocation_cnt += 1
-                        if self.__invocation_cnt > self.__max_calls:
-                            self.smell = True
-                            return
-            self.__visit_4_test(child)
-
-    def __visit_4_non_test(self, node, func_name):
-        # 非测试函数若满足条件加入候选
-        for child in node.children:
-            if child is None:
-                return
-            if child.type == 'call_expression':
-                if child.children[0].type == 'identifier':
-                    # child.children[0].text为函数名
-                    if child.children[0].text in self.__lazy_candidates:
-                        self.__lazy_candidates.append(func_name)
-                        return
-                    else:
-                        self.__invocation_cnt += 1
-                        if self.__invocation_cnt > self.__max_calls:
-                            self.__lazy_candidates.append(func_name)
-                            return
-                elif child.children[0].type == 'selector_expression':
-                    # child.children[0].children[2]为field名即函数名
-                    if child.children[0].children[2].text in self.__lazy_candidates:
-                        self.__lazy_candidates.append(func_name)
-                        return
-                    else:
-                        self.__invocation_cnt += 1
-                        if self.__invocation_cnt > self.__max_calls:
-                            self.__lazy_candidates.append(func_name)
-                            return
-            self.__visit_4_non_test(child, func_name)
-
     def visit(self, node):
-        if self.smell:
+        if self.smell or not self.__is_test:
             return
-        # go确保了函数使用前一定先声明
         if node.type == 'function_declaration':
-            self.__invocation_cnt = 0
-            if is_test_func(node):
-                block = get_method_body(node, 'go')
-                if block is None:
-                    return
-                self.__visit_4_test(block)
+            self.__freq = []  # 每次遇到函数声明说明步入新的测试方法，清空
+            # Go下标为1的子节点是函数名  形如 func x
+            method_name = node.children[1].text
+            if method_name.startswith(b'Test'):
+                self.__is_test = True
             else:
-                # 不是测试方法但是引入过多的方法调用，当测试方法调用它时，引入smell
-                block = get_method_body(node, 'go')
-                if block is None:
+                self.__is_test = False
+        elif node.type == 'call_expression':
+            func_name = node.children[0].text  # 函数调用就两种x.x和x()，取下标为0的内容，若是x.x则肯定匹配不上，若是x()则可能匹配
+            if func_name in self.__src_tobe_test:
+                # 这是一个待测函数
+                # node的子节点0是函数名，1是参数列表
+                arg_list = node.children[1].text
+                mixed = func_name + arg_list
+                if mixed in self.__freq:
+                    self.smell = True
                     return
-                func_name = node.children[1].text
-                self.__visit_4_non_test(block, func_name)
-
+                self.__freq.append(mixed)
+        return
