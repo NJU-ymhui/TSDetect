@@ -84,14 +84,12 @@ def is_test_class(name):
 
 
 def is_test_func(method_decl_node):
-    pattern1 = r'.*[Tt][Ee][Ss][Tt]'
-    pattern2 = r'[Tt][Ee][Ss][Tt].*'
     if method_decl_node.type != 'function_declaration':
         return False
     for child in method_decl_node.children:
         if child.type == 'identifier':
             # function_declaration的子节点的identifier是函数名
-            if re.search(pattern1, str(child.text)) or re.search(pattern2, str(child.text)):
+            if child.text.startswith(b'Test') or child.text.startswith(b'test'):
                 return True
             else:
                 return False
