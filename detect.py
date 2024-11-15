@@ -171,7 +171,7 @@ def main(directory, author_test=False):
 
 if __name__ == "__main__":
     path = "tests\\resources"  # 测试代码位置
-    tobe_test_path = "src\\resource"  # 源代码位置
+    tobe_test_path = "src\\resources"  # 源代码位置
     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     output_path = "result\\go\\" + now + "_output.txt"
     origin = sys.stdout
