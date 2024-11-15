@@ -4,6 +4,8 @@ from util.util import get_method_body, index_of, get_class_body, get_class_name,
 
 
 class EagerTestInspection(Inspection):
+    # TODO 有一个问题:Java支持先使用后声明,这导致看你先调用一个candidate但是在这之后candidate才被声明,那么在调用的时候是不知道它可能引入smell
+    # TODO 考虑用回调的方法或者回头看的方法解决
     # 一个测试函数应当只测试一个待测方法，可以多次调用这个待测方法，但只能有一种待测方法
     # 不必考虑java overloading, 认为是同一种方法, 因为没有数据流分析不好区分
     def __init__(self, src_root=None):
@@ -47,6 +49,9 @@ class EagerTestInspection(Inspection):
             self.__is_test = is_test_func(node)
             self.__variables_of_tested_class = []
             self.__cur_tested = b''
+            for child in node.children:
+                if child.type == 'identifier':
+                    self.__method_decl_name = child.text
         elif node.type == 'local_variable_declaration':
             ty = node.children[0].text
             if ty == self.__class_tobe_tested:
@@ -62,7 +67,7 @@ class EagerTestInspection(Inspection):
                 if self.__is_test:
                     self.smell = True
                     return
-                self.__eager_candidates.append(node)
+                self.__eager_candidates.append(self.__method_decl_name)
                 return
             # 提取第一组变量名和方法名, 若v.a().b().c()..., 不管了
             for i in range(len(node.children)):
@@ -81,5 +86,5 @@ class EagerTestInspection(Inspection):
                         if self.__is_test:
                             self.smell = True
                             return
-                        self.__eager_candidates.append(node)
+                        self.__eager_candidates.append(self.__method_decl_name)
                         return

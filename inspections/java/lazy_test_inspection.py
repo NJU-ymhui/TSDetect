@@ -8,10 +8,13 @@ class LazyTestInspection(Inspection):
     def __init__(self, src_root=None):
         super().__init__()
         self.__has_invoked = []
-        self.__methods_tobe_tested = []
+        self.__methods_tobe_tested = []  # 待测方法名
         self.__variables_of_tested_class = []  # 类型是待测对象的局部变量
         self.__global_variables = []  # 全局变量，类型同上
-        self.__class_tobe_tested = b''
+        self.__class_tobe_tested = b''  # 待测类名
+        self.__decl_method_name = b''  # 当前所在测试方法的名字
+        self.__lazy_candidates = []
+        self.__is_test = True
         class_body = None
         if src_root is not None:
             for child in src_root.children:
@@ -44,9 +47,21 @@ class LazyTestInspection(Inspection):
             # 考虑Java overloading的情况
             self.__has_invoked = []
             self.__variables_of_tested_class = []
+            self.__is_test = is_test_func(node)
+            for child in node.children:
+                if child.type == 'identifier':
+                    self.__decl_method_name = child.text  # 更新当前所在的方法名
+                    break
 
         elif node.type == 'method_invocation':
-            var_name = ''
+            var_name = node.children[0].text
+            if var_name in self.__lazy_candidates:
+                # 此时调用了一个会引入smell的候选方法
+                if self.__is_test:
+                    self.smell = True
+                else:
+                    self.__lazy_candidates.append(self.__decl_method_name)
+                return
             method_name = ''
             for i in range(len(node.children)):
                 if node.children[i].type == '.':
@@ -60,7 +75,10 @@ class LazyTestInspection(Inspection):
                     args = node.children[3].text  # 这里将问题简化,只考虑参数列表的字面量, 因为并没有做数据流分析
                     mixed = var_name + method_name + args
                     if mixed in self.__has_invoked:
-                        self.smell = True
+                        if self.__is_test:
+                            self.smell = True
+                        else:
+                            self.__lazy_candidates.append(self.__decl_method_name)
                         return
                     else:
                         self.__has_invoked.append(mixed)

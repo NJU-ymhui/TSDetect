@@ -1,10 +1,15 @@
 public class Demo_test {
-    @Test
-    public void test1() {
+
+    public void helper() {
         Demo d = new Demo();
         d.func();
         d.func();
         d.hello();
+    }
+
+    @Test
+    public void test1() {
+        helper();
         System.out.println("Hello World");
     }
 
