@@ -31,6 +31,10 @@ from datetime import datetime
 import sys
 
 
+# 准备添加源代码文件路径解析, 待测文件和测试文件的对拍协议同go
+src = ''
+
+
 def get_parser():
     parser = Parser()
     Language.build_library(
@@ -48,24 +52,32 @@ def get_tree(parser, code):
     return parser.parse(code)
 
 
-def generate_code(path):
-    with open(path, 'rb') as file:
+def generate_code(file_path):
+    with open(file_path, 'rb') as file:
         code = file.read()  # 读取整个文件内容
     return code
 
 
 def register_for(inspection_manager):
+    # 尝试解析源代码文件路径, 获得根节点
+    src_root = None
+    if src != '' and os.path.exists(src):
+        code = generate_code(src)
+        parser = get_parser()
+        tree = get_tree(parser, code)
+        src_root = tree.root_node
+
     assertion_roulette_inspection = AssertionRouletteInspection()
     conditional_test_logic_inspection = ConditionalTestLogicInspection()
     constructor_initialization_inspection = ConstructorInitializationInspection()
     default_test_inspection = DefaultTestInspection()
     duplicate_assert_inspection = DuplicateAssertInspection()
-    eager_test_inspection = EagerTestInspection()
+    eager_test_inspection = EagerTestInspection(src_root)
     empty_method_inspection = EmptyMethodInspection()
     exception_handling_inspection = ExceptionHandlingInspection()
     general_fixture_inspection = GeneralFixtureInspection()
     ignored_test_inspection = IgnoredTestInspection()
-    lazy_test_inspection = LazyTestInspection()
+    lazy_test_inspection = LazyTestInspection(src_root)
     magic_number_inspection = MagicNumberInspection()
     mystery_guest_inspection = MysteryGuestInspection()
     redundant_assertion_inspection = RedundantAssertionInspection()
@@ -108,9 +120,10 @@ def register_for(inspection_manager):
     inspection_manager.register(logs_inspection)
 
 
-def parse(path):
+def parse(file_path, src_file_path=''):
+    global src
     parser = get_parser()
-    code = generate_code(path)
+    code = generate_code(file_path)
     tree = get_tree(parser, code)
     visitor = TreeVisitor(tree.root_node)
     # print("types:")
@@ -122,12 +135,18 @@ def parse(path):
     # print("statements:")
     # visitor.print_statements_from_root()
 
+    # 遵循协议解析路径
+    if os.path.exists(src_file_path):
+        src = src_file_path
+    else:
+        src = ''
+
     inspection_manager = InspectionManager()
     register_for(inspection_manager)
 
     visitor.register(inspection_manager)
     visitor.parse()  # 遍历语法树解析
-    print("smell types in", path, end=":\n")
+    print("smell types in", file_path, end=":\n")
     print(inspection_manager.get_smells())  # 查看所有smell
     if inspection_manager.has_logs_inspection():
         print("Total of logs in this test file:", inspection_manager.get_logs_num())
@@ -136,18 +155,25 @@ def parse(path):
 
 
 def main(directory, author_test=False):
+    global src
     for root, dirs, files in os.walk(directory):
         # print(dirs, files)
         if "author_tests" in dirs and not author_test:
             dirs.remove("author_tests")
         for file in files:
             if file.endswith('.java'):
+                # 测试文件
+                # 按照协议寻找对应的源代码文件
+                mid_dir = root[len(path):]  # 当前文件除去测试代码根路径的中间路径, 测试代码与源代码此值须保持一致
+                src_file_path = src_path + mid_dir + "\\" + file[:-len("_test.java")] + '.java'
                 file_path = os.path.join(root, file)
-                parse(file_path)  # 开始解析文件
+                src = ''
+                parse(file_path, src_file_path)  # 开始解析文件
 
 
 if __name__ == "__main__":
     path = "tests\\resources"
+    src_path = "src\\resources"
     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     output_path = "result\\java\\" + now + "_output.txt"
     origin = sys.stdout
