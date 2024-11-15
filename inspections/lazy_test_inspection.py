@@ -7,7 +7,7 @@ class LazyTestInspection(Inspection):
     def __init__(self, src_file_root=None):
         super().__init__()
         self.__freq = []  # 测试函数及其对应参数
-        self.__is_test = False
+        self.__is_test = True  # 先初始化为True防止进不去
         self.__cur_tested = b''
         self.__src_tobe_test = []
         if src_file_root is not None:
@@ -23,7 +23,7 @@ class LazyTestInspection(Inspection):
         return self.smell
 
     def visit(self, node):
-        if self.smell or not self.__is_test:
+        if self.smell:
             return
         if node.type == 'function_declaration':
             self.__freq = []  # 每次遇到函数声明说明步入新的测试方法，清空
@@ -33,7 +33,7 @@ class LazyTestInspection(Inspection):
                 self.__is_test = True
             else:
                 self.__is_test = False
-        elif node.type == 'call_expression':
+        elif node.type == 'call_expression' and self.__is_test:
             func_name = node.children[0].text  # 函数调用就两种x.x和x()，取下标为0的内容，若是x.x则肯定匹配不上，若是x()则可能匹配
             if func_name in self.__src_tobe_test:
                 # 这是一个待测函数

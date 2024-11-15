@@ -44,24 +44,37 @@ def get_tree(parser, code):
     return parser.parse(code)
 
 
-def generate_code(path):
-    with open(path, 'rb') as file:
+def generate_code(file_path):
+    with open(file_path, 'rb') as file:
         code = file.read()  # 读取整个文件内容
     return code
 
 
+src = ''
+
+
 def register_for(inspection_manager):
+    # 尝试引入测试源文件，然后解析出根节点，从而初始化eager和lazy
+    src_root = None
+    if src != '' and os.path.exists(src):
+        # 解析源文件得到src_root
+        with open(src, 'rb') as sf:
+            code = sf.read()
+        parser = get_parser()
+        tree = parser.parse(code)
+        src_root = tree.root_node
+
     assertion_roulette_inspection = AssertionRouletteInspection()
     conditional_test_logic_inspection = ConditionalTestLogicInspection()
     # constructor_initialization_inspection = ConstructorInitializationInspection()
     default_test_inspection = DefaultTestInspection()
     duplicate_assert_inspection = DuplicateAssertInspection()
-    eager_test_inspection = EagerTestInspection()
+    eager_test_inspection = EagerTestInspection(src_file_root=src_root)
     empty_method_inspection = EmptyMethodInspection()
     exception_handling_inspection = ExceptionHandlingInspection()
     general_fixture_inspection = GeneralFixtureInspection()
     # ignored_test_inspection = IgnoredTestInspection()
-    lazy_test_inspection = LazyTestInspection()
+    lazy_test_inspection = LazyTestInspection(src_file_root=src_root)
     magic_number_inspection = MagicNumberInspection()
     mystery_guest_inspection = MysteryGuestInspection()
     # redundant_assertion_inspection = RedundantAssertionInspection()
@@ -104,9 +117,10 @@ def register_for(inspection_manager):
     inspection_manager.register(verbose_variable_inspection)
 
 
-def parse(path):
+def parse(file_path, src_path=''):
+    global src
     parser = get_parser()
-    code = generate_code(path)
+    code = generate_code(file_path)
     tree = get_tree(parser, code)
     visitor = TreeVisitor(tree.root_node)
     # print("types:")
@@ -119,11 +133,16 @@ def parse(path):
     # visitor.print_statements_from_root()
 
     inspection_manager = InspectionManager()
+    # 做协议规约1，用对拍检查源代码文件是否存在(在main()里)
+    if os.path.exists(src_path):
+        src = src_path
+    else:
+        src = ''
     register_for(inspection_manager)
 
     visitor.register(inspection_manager)
     visitor.parse()  # 遍历语法树解析
-    print("smell types in", path, end=":\n")
+    print("smell types in", file_path, end=":\n")
     print(inspection_manager.get_smells())  # 查看所有smell
     if inspection_manager.has_logs_inspection():
         print('Total of logs in this test file:', inspection_manager.get_logs_num())
@@ -132,6 +151,7 @@ def parse(path):
 
 
 def main(directory, author_test=False):
+    global src
     for root, dirs, files in os.walk(directory):
         # print(dirs, files)
         if "author_tests" in dirs and not author_test:
@@ -139,11 +159,19 @@ def main(directory, author_test=False):
         for file in files:
             if file.endswith('.go'):
                 file_path = os.path.join(root, file)
-                parse(file_path)  # 开始解析文件
+                # 判断能不能找到源文件
+                # 协议：源（待测）文件放在src里，除去根目录src和最终文件名，中间路径必须一致
+                # 先把中间路径截取下来
+                mid_dir = root[len(path):]
+                # 协议规约2：测试文件名必须是对应源文件名的，去掉后缀，再加_test.go, 对应的，源文件名就是测试文件中_test.go->。go
+                src_path = tobe_test_path + mid_dir + "\\" + file[:-8] + '.go'
+                src = ''
+                parse(file_path, src_path)  # 开始解析文件
 
 
 if __name__ == "__main__":
-    path = "tests\\resources"
+    path = "tests\\resources"  # 测试代码位置
+    tobe_test_path = "src\\resource"  # 源代码位置
     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     output_path = "result\\go\\" + now + "_output.txt"
     origin = sys.stdout
