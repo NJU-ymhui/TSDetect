@@ -4,8 +4,8 @@ from util.util import get_method_body, index_of, get_class_body, get_class_name,
 
 
 class EagerTestInspection(Inspection):
-    # TODO 有一个问题:Java支持先使用后声明,这导致看你先调用一个candidate但是在这之后candidate才被声明,那么在调用的时候是不知道它可能引入smell
-    # TODO 考虑用回调的方法或者回头看的方法解决
+    # 已finish: 有一个问题:Java支持先使用后声明, 这导致当你先调用一个candidate但是在这之后candidate才被声明,那么在调用的时候是不知道它可能引入smell
+    # 考虑用回调的方法或者回头看的方法解决
     # 一个测试函数应当只测试一个待测方法，可以多次调用这个待测方法，但只能有一种待测方法
     # 不必考虑java overloading, 认为是同一种方法, 因为没有数据流分析不好区分
     def __init__(self, src_root=None):
@@ -16,6 +16,8 @@ class EagerTestInspection(Inspection):
         self.__method_decl_name = b''  # 测试类中声明的方法名
         self.__class_tobe_tested = b''  # 待测类名
         self.__methods_tobe_tested = []  # 待测类中的待测方法
+        self.__non_test_table = []  # 非测试方法的函数名
+        self.__use_of_not_decl = []  # 元素是元组，第一位为caller第二位是callee，若caller是测试方法则恒为"@test", 反之是方法名
         self.__is_test = True
         class_body = None
         if src_root is not None:
@@ -52,6 +54,8 @@ class EagerTestInspection(Inspection):
             for child in node.children:
                 if child.type == 'identifier':
                     self.__method_decl_name = child.text
+            if not self.__is_test:
+                self.__non_test_table.append(self.__method_decl_name)  # 注册一个非测试方法, 且代表目前它已经声明
         elif node.type == 'local_variable_declaration':
             ty = node.children[0].text
             if ty == self.__class_tobe_tested:
@@ -63,6 +67,17 @@ class EagerTestInspection(Inspection):
         elif node.type == 'method_invocation':
             var_name = node.children[0].text  # 0号节点要么是func如果是func(), 要么是变量名var如果是var.method()
             method_name = ''  # 要么a.method(), 要么func()
+            if var_name not in self.__non_test_table:
+                # 如果名字都不在已声明的非测试方法中，那必然不可能在candidates中
+                # 记录以在之后声明时回调
+                # 下面要验证是不是func(), 即没有.
+                if str(var_name).find('.') == -1:
+                    # 确实是func()形式的调用，且尚未声明
+                    cur_name = self.__method_decl_name
+                    if self.__is_test:
+                        cur_name = '@test'
+                    # 记录
+                    self.__use_of_not_decl.append((cur_name, var_name))
             if var_name in self.__eager_candidates:  # 若是func()且匹配候选则触发smell(因为in candidates的一定是func())
                 if self.__is_test:
                     self.smell = True
@@ -86,5 +101,16 @@ class EagerTestInspection(Inspection):
                         if self.__is_test:
                             self.smell = True
                             return
+                        else:
+                            # 回调__use_of_not_decl来查看是否有存在先使用再声明的情况，若有，回调更新状态
+                            for item in self.__use_of_not_decl:
+                                if item[0] == '@test' and item[1] == self.__method_decl_name:
+                                    # 之前有某个测试方法调用了当前这个非测试方法，但是当时没有声明
+                                    # 而这个测试方法使用的非测试方法在后续的定义过程中引入了smell，因此触发
+                                    self.smell = True
+                                    return
+                                elif item[1] == self.__method_decl_name:
+                                    # 之前调用当前这个引入smell的是非测试方法，则将它加入候选
+                                    self.__eager_candidates.append(item[0])
                         self.__eager_candidates.append(self.__method_decl_name)
                         return

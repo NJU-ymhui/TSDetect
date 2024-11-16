@@ -14,6 +14,8 @@ class LazyTestInspection(Inspection):
         self.__class_tobe_tested = b''  # 待测类名
         self.__decl_method_name = b''  # 当前所在测试方法的名字
         self.__lazy_candidates = []
+        self.__non_test_table = []  # 非测试方法的函数名
+        self.__use_of_not_decl = []  # 元素是元组，第一位为caller第二位是callee，若caller是测试方法则恒为"@test", 反之是方法名
         self.__is_test = True
         class_body = None
         if src_root is not None:
@@ -52,9 +54,21 @@ class LazyTestInspection(Inspection):
                 if child.type == 'identifier':
                     self.__decl_method_name = child.text  # 更新当前所在的方法名
                     break
-
+            if not self.__is_test:
+                self.__non_test_table.append(self.__decl_method_name)
         elif node.type == 'method_invocation':
             var_name = node.children[0].text
+            if var_name not in self.__non_test_table:
+                # 如果名字都不在已声明的非测试方法中，那必然不可能在candidates中
+                # 记录以在之后声明时回调
+                # 下面要验证是不是func(), 即没有.
+                if str(var_name).find('.') == -1:
+                    # 确实是func()形式的调用，且尚未声明
+                    cur_name = self.__decl_method_name
+                    if self.__is_test:
+                        cur_name = '@test'
+                    # 记录
+                    self.__use_of_not_decl.append((cur_name, var_name))
             if var_name in self.__lazy_candidates:
                 # 此时调用了一个会引入smell的候选方法
                 if self.__is_test:
@@ -78,6 +92,15 @@ class LazyTestInspection(Inspection):
                         if self.__is_test:
                             self.smell = True
                         else:
+                            # 不是测试方法但是当前这个非测试方法引入了smell
+                            # 回调__use_of_not_decl来查看是否有存在先使用再声明的情况，若有，回调更新状态
+                            for item in self.__use_of_not_decl:
+                                if item[0] == '@test' and item[1] == self.__decl_method_name:
+                                    self.smell = True
+                                    return
+                                elif item[1] == self.__decl_method_name:
+                                    # 之前调用这个引入smell的方法的是非测试方法，加入候选
+                                    self.__lazy_candidates.append(item[0])
                             self.__lazy_candidates.append(self.__decl_method_name)
                         return
                     else:
