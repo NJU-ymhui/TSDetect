@@ -9,9 +9,10 @@ A tool for detecting Go test smell
 3. Click start.bat
 
 ## Get Better Result
-If you can provide the initial java codes which are the tested codes of the unit tests in `src/resources`, you can get better result.
+If you can provide the initial go codes which are the tested codes of the unit tests in `src/resources`, you can get better result.
 <br>
-1. Rename your unit test file to `{$SRC_TESTED_FILE_NAME}_test.go`, this may not satisfy the naming rule, but it can help the tool to find the tested class.
+1. Rename your unit test file to `{$SRC_TESTED_FILE_NAME}_test.go`, this may not satisfy the naming rule, but it can help the tool to find the 
+source tested file.
 2. Ensure your source tested codes are named with `{$SRC_TESTED_FILE_NAME}.go`. For example, if you have a source tested 
 file named `foo.go`, and relatively the unit test file should be named as `foo_test.go`.
 3. Ensure the relative path of the source tested codes and the unit test file are the same. For example, if the unit test file 
