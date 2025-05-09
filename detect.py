@@ -1,37 +1,34 @@
+import sys
+from datetime import datetime
+
 from tree_sitter import Language, Parser
 from visitor.tree_visitor import TreeVisitor
 from inspection_manager.inspection_manager import InspectionManager
-from inspections.java.assertion_roulette_inspection import AssertionRouletteInspection
-from inspections.java.conditional_test_logic_inspection import ConditionalTestLogicInspection
-from inspections.java.constructor_initialization_inspection import ConstructorInitializationInspection
-from inspections.java.default_test_inspection import DefaultTestInspection
-from inspections.java.duplicate_assert_inspection import DuplicateAssertInspection
-from inspections.java.lazy_test_inspection import LazyTestInspection
-from inspections.java.empty_method_inspection import EmptyMethodInspection
-from inspections.java.exception_handling_inspection import ExceptionHandlingInspection
-from inspections.java.general_fixture_inspection import GeneralFixtureInspection
-from inspections.java.ignored_test_inspection import IgnoredTestInspection
-from inspections.java.eager_test_inspection import EagerTestInspection
-from inspections.java.magic_number_inspection import MagicNumberInspection
-from inspections.java.mystery_guest_inspection import MysteryGuestInspection
-from inspections.java.redundant_assertion_inspection import RedundantAssertionInspection
-from inspections.java.redundant_print_inspection import RedundantPrintInspection
-from inspections.java.resource_optimism_inspection import ResourceOptimismInspection
-from inspections.java.sensitive_equality_inspection import SensitiveEqualityInspection
-from inspections.java.sleepy_test_inspection import SleepyTestInspection
-from inspections.java.unknown_test_inspection import UnknownTestInspection
-from inspections.java.verbose_test_inspection import VerboseTestInspection
-from inspections.java.tate_leakage_inspection import TateLeakageInspection
-from inspections.java.non_deterministic import NonDeterministicInspection
-from inspections.java.test_run_war_inspection import TestRunWarInspection
-from inspections.java.verbose_variable_inspection import VerboseVariableInspection
-from inspections.java.logs_inspection import LogsInspection
+from inspections.python.assertion_roulette_inspection import AssertionRouletteInspection
+from inspections.python.conditional_test_logic_inspection import ConditionalTestLogicInspection
+from inspections.python.constructor_initialization_inspection import ConstructorInitializationInspection
+from inspections.python.default_test_inspection import DefaultTestInspection
+from inspections.python.duplicate_assert_inspection import DuplicateAssertInspection
+from inspections.python.eager_test_inspection import EagerTestInspection
+from inspections.python.empty_method_inspection import EmptyMethodInspection
+from inspections.python.exception_handling_inspection import ExceptionHandlingInspection
+from inspections.python.general_fixture_inspection import GeneralFixtureInspection
+from inspections.python.test_run_war_inspection import TestRunWarInspection
+from inspections.python.ignored_test_inspection import IgnoredTestInspection
+from inspections.python.verbose_variable_inspection import VerboseVariableInspection
+from inspections.python.lazy_test_inspection import LazyTestInspection
+from inspections.python.magic_number_inspection import MagicNumberInspection
+from inspections.python.mystery_guest_inspection import MysteryGuestInspection
+from inspections.python.redundant_assertion_inspection import RedundantAssertionInspection
+from inspections.python.redundant_print_inspection import RedundantPrintInspection
+from inspections.python.resource_optimism_inspection import ResourceOptimismInspection
+from inspections.python.sensitive_equality_inspection import SensitiveEqualityInspection
+from inspections.python.sleepy_test_inspection import SleepyTestInspection
+from inspections.python.unknown_test_inspection import UnknownTestInspection
+from inspections.python.verbose_test_inspection import VerboseTestInspection
 import os
-from datetime import datetime
-import sys
 
 
-# 准备添加源代码文件路径解析, 待测文件和测试文件的对拍协议同go
 src = ''
 smell_types_freq = {
     'SmellType.ASSERTION_ROULETTE': 0,
@@ -68,11 +65,11 @@ def get_parser():
     Language.build_library(
         'build/my-languages.so',
         [
-            'tree-sitter-java'
+            'tree-sitter-python'
         ]
     )
-    java_language = Language('build/my-languages.so', 'java')
-    parser.set_language(java_language)
+    python_language = Language('build/my-languages.so', 'python')
+    parser.set_language(python_language)
     return parser
 
 
@@ -80,8 +77,8 @@ def get_tree(parser, code):
     return parser.parse(code)
 
 
-def generate_code(file_path):
-    with open(file_path, 'rb') as file:
+def generate_code(path):
+    with open(path, 'rb') as file:
         code = file.read()  # 读取整个文件内容
     return code
 
@@ -90,6 +87,7 @@ def register_for(inspection_manager):
     # 尝试解析源代码文件路径, 获得根节点
     src_root = None
     if src != '' and os.path.exists(src):
+        # print(src)
         code = generate_code(src)
         parser = get_parser()
         tree = get_tree(parser, code)
@@ -101,6 +99,7 @@ def register_for(inspection_manager):
     default_test_inspection = DefaultTestInspection()
     duplicate_assert_inspection = DuplicateAssertInspection()
     eager_test_inspection = EagerTestInspection(src_root)
+    test_run_war_inspection = TestRunWarInspection()
     empty_method_inspection = EmptyMethodInspection()
     exception_handling_inspection = ExceptionHandlingInspection()
     general_fixture_inspection = GeneralFixtureInspection()
@@ -108,6 +107,7 @@ def register_for(inspection_manager):
     lazy_test_inspection = LazyTestInspection(src_root)
     magic_number_inspection = MagicNumberInspection()
     mystery_guest_inspection = MysteryGuestInspection()
+    verbose_variable_inspection = VerboseVariableInspection()
     redundant_assertion_inspection = RedundantAssertionInspection()
     redundant_print_inspection = RedundantPrintInspection()
     resource_optimism_inspection = ResourceOptimismInspection()
@@ -115,18 +115,15 @@ def register_for(inspection_manager):
     sleepy_test_inspection = SleepyTestInspection()
     unknown_test_inspection = UnknownTestInspection()
     verbose_test_inspection = VerboseTestInspection()
-    tate_leakage_inspection = TateLeakageInspection()
-    non_deterministic_inspection = NonDeterministicInspection()
-    test_run_war_inspection = TestRunWarInspection()
-    verbose_variable_inspection = VerboseVariableInspection()
-    logs_inspection = LogsInspection()
 
+    inspection_manager.register(verbose_variable_inspection)
     inspection_manager.register(assertion_roulette_inspection)
     inspection_manager.register(conditional_test_logic_inspection)
     inspection_manager.register(constructor_initialization_inspection)
     inspection_manager.register(default_test_inspection)
     inspection_manager.register(duplicate_assert_inspection)
     inspection_manager.register(eager_test_inspection)
+    inspection_manager.register(test_run_war_inspection)
     inspection_manager.register(empty_method_inspection)
     inspection_manager.register(exception_handling_inspection)
     inspection_manager.register(general_fixture_inspection)
@@ -141,17 +138,15 @@ def register_for(inspection_manager):
     inspection_manager.register(sleepy_test_inspection)
     inspection_manager.register(unknown_test_inspection)
     inspection_manager.register(verbose_test_inspection)
-    inspection_manager.register(tate_leakage_inspection)
-    inspection_manager.register(non_deterministic_inspection)
-    inspection_manager.register(test_run_war_inspection)
-    inspection_manager.register(verbose_variable_inspection)
-    inspection_manager.register(logs_inspection)
 
 
-def parse(file_path, src_file_path=''):
-    global src, smell_types_freq
+tot_smell, comment_cnt = 0, 0
+
+
+def parse(path, src_file_path=''):
+    global src, tot_smell, comment_cnt, smell_types_freq
     parser = get_parser()
-    code = generate_code(file_path)
+    code = generate_code(path)
     tree = get_tree(parser, code)
     visitor = TreeVisitor(tree.root_node)
     # print("types:")
@@ -163,7 +158,6 @@ def parse(file_path, src_file_path=''):
     # print("statements:")
     # visitor.print_statements_from_root()
 
-    # 遵循协议解析路径
     if os.path.exists(src_file_path):
         src = src_file_path
     else:
@@ -174,38 +168,43 @@ def parse(file_path, src_file_path=''):
 
     visitor.register(inspection_manager)
     visitor.parse()  # 遍历语法树解析
-    print("smell types in", file_path, end=":\n")
+    # visitor.check_all_types()
+    print("smell types in", path, end=":\n")
     print(inspection_manager.get_smells())  # 查看所有smell
+    tot_smell += len(inspection_manager.get_smells())
+    # print(smell_types_freq[SmellType.UNKNOWN_TEST])
     for st in inspection_manager.get_smells():
         smell_types_freq[st] += 1
     if inspection_manager.has_logs_inspection():
         print("Total of logs in this test file:", inspection_manager.get_logs_num())
     print("Total of line comments in this test file:", visitor.get_comments_cnt())
+    comment_cnt += visitor.get_comments_cnt()
     print()
 
 
 def main(directory, author_test=False):
-    global src
+    global src, tot_smell, comment_cnt
+    tot_smell = comment_cnt = 0
     for root, dirs, files in os.walk(directory):
         # print(dirs, files)
         if "author_tests" in dirs and not author_test:
             dirs.remove("author_tests")
         for file in files:
-            if file.endswith('.java'):
-                # 测试文件
-                # 按照协议寻找对应的源代码文件
+            if file.endswith('.py'):
                 mid_dir = root[len(path):]  # 当前文件除去测试代码根路径的中间路径, 测试代码与源代码此值须保持一致
-                src_file_path = src_path + mid_dir + "\\" + file[:-len("_test.java")] + '.java'
+                src_file_path = src_path + mid_dir + "\\" + file[:-len("_test.py")] + '.py'
                 file_path = os.path.join(root, file)
                 src = ''
                 parse(file_path, src_file_path)  # 开始解析文件
+    print("Total of smells:", tot_smell)
+    print("Total of line comments:", comment_cnt)
 
 
 if __name__ == "__main__":
-    path = "tests\\resources\\java"
-    src_path = "src\\resources\\java"
+    path = "tests\\resources\\step1\\deepseek\\python"
+    src_path = "src\\resources\\step1\\deepseek\\python"
     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    output_path = "result\\java\\" + now + "_output.txt"
+    output_path = "result\\python\\" + now + "_output.txt"
     origin = sys.stdout
     # main(path, True)
     with open(output_path, 'w') as f:
@@ -218,5 +217,6 @@ if __name__ == "__main__":
         print("Each smell frequency:")
         for smell_type in smell_types_freq:
             print(smell_type, ":", smell_types_freq[smell_type])
+
     sys.stdout = origin
     print("Detection finished, output file is", output_path)
