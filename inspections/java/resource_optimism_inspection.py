@@ -5,12 +5,16 @@ from util.util import is_variable_decl, print_child
 
 class ResourceOptimismInspection(Inspection):
     # TODO 暂时无法解决一个方法接受File参数，然后方法内部检验 /不检验file的存在，之后一个File变量通过该方法传进去，暂时判断不了
+    # TODO 识别全局变量的 File 类型
     def __init__(self):
         super().__init__()
         self.__current_method = 0  # 0表示成员变量
         self.__unchecked_files = {0: []}
         self.__checked_files = {0: []}  # 事实上只有成员变量可能用到这个数据结构，因为只有成员变量可能先使用再声明，而局部变量不可能
         self.__check_methods = [b'exists', b'notExists', b'isFile']
+        # 开一个数据结构记录变量的类型
+        self.__var2type = {}  # 局部变量
+        self.__glob2type = {}  # 全局变量
 
     def get_smell_type(self):
         return SmellType.RESOURCE_OPTIMISM
@@ -45,10 +49,22 @@ class ResourceOptimismInspection(Inspection):
             self.__current_method += 1
             self.__unchecked_files[self.__current_method] = []
             self.__checked_files[self.__current_method] = []
+            self.__var2type = {}
             return
         if is_variable_decl(node):
             if node.parent.type == 'field_declaration':
                 area = 0
+                ty = ''
+                name = ''
+                for i in range(len(node.children)):
+                    if node.children[i].type == 'identifier':
+                        name = node.children[i].text
+                    elif node.children[i].type == 'type_identifier':
+                        ty = node.children[i].text
+                    if ty != '' and name != '':
+                        break
+                self.__glob2type[name] = ty  # ty可以判断是否是File类型
+                # TODO 正式用之前先复习一下逻辑，这块可能是冗余的
             else:
                 area = self.__current_method
             if self.__is_file_decl(node):

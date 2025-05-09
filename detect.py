@@ -33,6 +33,34 @@ import sys
 
 # 准备添加源代码文件路径解析, 待测文件和测试文件的对拍协议同go
 src = ''
+smell_types_freq = {
+    'SmellType.ASSERTION_ROULETTE': 0,
+    'SmellType.CONDITIONAL_TEST': 0,
+    'SmellType.CONSTRUCTOR_INITIALIZATION': 0,
+    'SmellType.DEFAULT_TEST': 0,
+    'SmellType.DUPLICATE_ASSERT': 0,
+    'SmellType.EAGER_TEST': 0,
+    'SmellType.EMPTY_TEST': 0,
+    'SmellType.EXCEPTION_HANDLING': 0,
+    'SmellType.GENERAL_FIXTURE': 0,
+    'SmellType.IGNORED_TEST': 0,
+    'SmellType.LAZY_TEST': 0,
+    'SmellType.MAGIC_NUMBER': 0,
+    'SmellType.MYSTERY_GUEST': 0,
+    'SmellType.REDUNDANT_ASSERTION': 0,
+    'SmellType.REDUNDANT_PRINT': 0,
+    'SmellType.RESOURCE_OPTIMISM': 0,
+    'SmellType.SENSITIVE_EQUALITY': 0,
+    'SmellType.SLEEPY_TEST': 0,
+    'SmellType.UNKNOWN_TEST': 0,
+    'SmellType.VERBOSE_TEST': 0,
+    'SmellType.TATE_LEAKAGE': 0,
+    'SmellType.TEST_RUN_WAR': 0,
+    'SmellType.VERBOSE_VARIABLE': 0,
+    'SmellType.NON_DETERMINISTIC_TEST': 0,
+    'SmellType.MISSING_CLEANUP': 0,
+    'SmellType.LOGS_EXISTS': 0
+}
 
 
 def get_parser():
@@ -121,7 +149,7 @@ def register_for(inspection_manager):
 
 
 def parse(file_path, src_file_path=''):
-    global src
+    global src, smell_types_freq
     parser = get_parser()
     code = generate_code(file_path)
     tree = get_tree(parser, code)
@@ -148,6 +176,8 @@ def parse(file_path, src_file_path=''):
     visitor.parse()  # 遍历语法树解析
     print("smell types in", file_path, end=":\n")
     print(inspection_manager.get_smells())  # 查看所有smell
+    for st in inspection_manager.get_smells():
+        smell_types_freq[st] += 1
     if inspection_manager.has_logs_inspection():
         print("Total of logs in this test file:", inspection_manager.get_logs_num())
     print("Total of line comments in this test file:", visitor.get_comments_cnt())
@@ -172,8 +202,8 @@ def main(directory, author_test=False):
 
 
 if __name__ == "__main__":
-    path = "tests\\resources"
-    src_path = "src\\resources"
+    path = "tests\\resources\\java"
+    src_path = "src\\resources\\java"
     now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     output_path = "result\\java\\" + now + "_output.txt"
     origin = sys.stdout
@@ -182,8 +212,11 @@ if __name__ == "__main__":
         sys.stdout = f
         print("Start detecting at " + now + ":")
         print()
-        main(path)
+        main(path, True)
         now = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
         print("End detecting at " + now)
+        print("Each smell frequency:")
+        for smell_type in smell_types_freq:
+            print(smell_type, ":", smell_types_freq[smell_type])
     sys.stdout = origin
     print("Detection finished, output file is", output_path)
